@@ -1,8 +1,0 @@
-/* Ví dụ: Gắn font Google nếu không dùng Tailwind trực tiếp */
-body {
-  font-family: 'Poppins', sans-serif;
-}
-
-h1 {
-  font-family: 'Playfair Display', serif;
-}
