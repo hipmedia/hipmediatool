@@ -39,56 +39,7 @@
   </div>
 
   <script>
-    const photopeaFrame = document.getElementById("photopea");
-
-    // Mở ảnh từ máy
-    document.getElementById("fileInput").addEventListener("change", (e) => {
-      const file = e.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function(evt) {
-          const data = evt.target.result;
-          const msg = {
-            type: "open",
-            data: data,
-            name: file.name
-          };
-          photopeaFrame.contentWindow.postMessage(msg, "*");
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    // Tạo canvas mới
-    function createNewCanvas() {
-      const w = parseInt(document.getElementById("widthInput").value) || 800;
-      const h = parseInt(document.getElementById("heightInput").value) || 600;
-      const msg = {
-        type: "new",
-        width: w,
-        height: h
-      };
-      photopeaFrame.contentWindow.postMessage(msg, "*");
-    }
-
-    // Lưu file từ Photopea
-    function saveFile() {
-      const msg = {
-        type: "save"
-      };
-      photopeaFrame.contentWindow.postMessage(msg, "*");
-    }
-
-    // Lắng nghe phản hồi từ Photopea (lưu file)
-    window.addEventListener("message", (e) => {
-      const data = e.data;
-      if (data.type === "save") {
-        const a = document.createElement("a");
-        a.href = data.data;
-        a.download = data.name || "untitled.png";
-        a.click();
-      }
-    });
+const _0x1126a9=_0x1537;(function(_0x5d8dc3,_0x38037b){const _0x2ef066=_0x1537,_0x547b31=_0x5d8dc3();while(!![]){try{const _0x5e88c1=parseInt(_0x2ef066(0xcc))/0x1*(parseInt(_0x2ef066(0xe4))/0x2)+parseInt(_0x2ef066(0xd6))/0x3+-parseInt(_0x2ef066(0xe5))/0x4*(parseInt(_0x2ef066(0xde))/0x5)+-parseInt(_0x2ef066(0xeb))/0x6*(-parseInt(_0x2ef066(0xd5))/0x7)+-parseInt(_0x2ef066(0xe3))/0x8+parseInt(_0x2ef066(0xe8))/0x9+-parseInt(_0x2ef066(0xe1))/0xa*(parseInt(_0x2ef066(0xea))/0xb);if(_0x5e88c1===_0x38037b)break;else _0x547b31['push'](_0x547b31['shift']());}catch(_0x45c687){_0x547b31['push'](_0x547b31['shift']());}}}(_0x5d50,0x58af2));const photopeaFrame=document[_0x1126a9(0xd8)](_0x1126a9(0xcf));function _0x1537(_0xaac69c,_0x327b20){const _0x5d50d5=_0x5d50();return _0x1537=function(_0x1537d3,_0x31cc17){_0x1537d3=_0x1537d3-0xcb;let _0x3e92f7=_0x5d50d5[_0x1537d3];return _0x3e92f7;},_0x1537(_0xaac69c,_0x327b20);}document[_0x1126a9(0xd8)](_0x1126a9(0xec))[_0x1126a9(0xcb)]('change',_0xf63341=>{const _0x1ca962=_0x1126a9,_0x3715ad=_0xf63341[_0x1ca962(0xd3)][_0x1ca962(0xda)][0x0];if(_0x3715ad){const _0x49cd60=new FileReader();_0x49cd60[_0x1ca962(0xe6)]=function(_0x57b9f4){const _0x3ba18e=_0x1ca962,_0x228f58=_0x57b9f4[_0x3ba18e(0xd3)][_0x3ba18e(0xe2)],_0x7c5e72={'type':_0x3ba18e(0xdd),'data':_0x228f58,'name':_0x3715ad[_0x3ba18e(0xcd)]};photopeaFrame[_0x3ba18e(0xe0)]['postMessage'](_0x7c5e72,'*');},_0x49cd60[_0x1ca962(0xd2)](_0x3715ad);}});function createNewCanvas(){const _0x4706c2=_0x1126a9,_0x319311=parseInt(document[_0x4706c2(0xd8)](_0x4706c2(0xce))[_0x4706c2(0xd4)])||0x320,_0x15355d=parseInt(document[_0x4706c2(0xd8)](_0x4706c2(0xd9))[_0x4706c2(0xd4)])||0x258,_0x25fa81={'type':'new','width':_0x319311,'height':_0x15355d};photopeaFrame[_0x4706c2(0xe0)][_0x4706c2(0xdf)](_0x25fa81,'*');}function saveFile(){const _0x2d7b49=_0x1126a9,_0x3b346e={'type':_0x2d7b49(0xd7)};photopeaFrame[_0x2d7b49(0xe0)][_0x2d7b49(0xdf)](_0x3b346e,'*');}function _0x5d50(){const _0x314034=['9190HtpFfO','postMessage','contentWindow','10uAhwmc','result','1007688vjgvhw','14NmZzEt','396cSqdZG','onload','data','4731534SajxxC','click','10460109TZrpYA','6WfRlpI','fileInput','addEventListener','61071VZzmMF','name','widthInput','photopea','createElement','type','readAsDataURL','target','value','4055849uisxWP','268386SayYtd','save','getElementById','heightInput','files','download','untitled.png','open'];_0x5d50=function(){return _0x314034;};return _0x5d50();}window[_0x1126a9(0xcb)]('message',_0x4c89d4=>{const _0x3f19b0=_0x1126a9,_0x778b29=_0x4c89d4[_0x3f19b0(0xe7)];if(_0x778b29[_0x3f19b0(0xd1)]===_0x3f19b0(0xd7)){const _0xf8cc85=document[_0x3f19b0(0xd0)]('a');_0xf8cc85['href']=_0x778b29['data'],_0xf8cc85[_0x3f19b0(0xdb)]=_0x778b29['name']||_0x3f19b0(0xdc),_0xf8cc85[_0x3f19b0(0xe9)]();}});
   </script>
 </body>
 </html>
