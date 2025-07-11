@@ -1,0 +1,325 @@
+/* Định nghĩa biến CSS cho chế độ sáng */
+:root {
+  --bg-color: linear-gradient(to right, #e0f7fa, #80deea, #e0f7fa);
+  --text-color: #333;
+  --container-bg: rgba(255, 255, 255, 0.6);
+  --container-border: rgba(255, 255, 255, 0.3);
+  --input-bg: rgba(255, 255, 255, 0.8);
+  --input-border: rgba(0, 0, 0, 0.15);
+  --label-color: #555;
+  --button-primary-bg: rgba(0, 123, 255, 0.8);
+  --button-primary-hover-bg: rgba(0, 87, 179, 0.9);
+  --button-success-bg: rgba(40, 167, 69, 0.8);
+  --button-success-hover-bg: rgba(28, 117, 48, 0.9);
+  --button-secondary-bg: rgba(108, 117, 125, 0.8);
+  --button-secondary-hover-bg: rgba(84, 90, 97, 0.9);
+  --qr-area-bg: rgba(255, 255, 255, 0.7);
+  --browse-btn-bg: rgba(220, 220, 220, 0.8);
+  --browse-btn-hover-bg: rgba(200, 200, 200, 0.9);
+  --modal-bg: #ffffff;
+  --modal-header-bg: #f8f9fa;
+  --modal-border-color: #dee2e6;
+}
+
+/* Định nghĩa biến CSS cho chế độ tối */
+body.dark-mode {
+  --bg-color: linear-gradient(to right, #2c3e50, #34495e, #2c3e50); /* Darker gradient */
+  --text-color: #e0e0e0; /* Light text */
+  --container-bg: rgba(0, 0, 0, 0.4); /* Darker transparent background */
+  --container-border: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(0, 0, 0, 0.5);
+  --input-border: rgba(255, 255, 255, 0.2);
+  --label-color: #c0c0c0;
+  --button-primary-bg: rgba(52, 152, 219, 0.8); /* Lighter blue */
+  --button-primary-hover-bg: rgba(41, 128, 185, 0.9);
+  --button-success-bg: rgba(46, 204, 113, 0.8); /* Lighter green */
+  --button-success-hover-bg: rgba(39, 174, 96, 0.9);
+  --button-secondary-bg: rgba(127, 140, 141, 0.8); /* Lighter grey */
+  --button-secondary-hover-bg: rgba(96, 108, 109, 0.9);
+  --qr-area-bg: rgba(0, 0, 0, 0.6);
+  --browse-btn-bg: rgba(50, 50, 50, 0.8);
+  --browse-btn-hover-bg: rgba(70, 70, 70, 0.9);
+  --modal-bg: #343a40;
+  --modal-header-bg: #495057;
+  --modal-border-color: #6c757d;
+}
+
+body {
+  background: var(--bg-color);
+  background-size: 400% 400%;
+  animation: gradientAnimation 15s ease infinite;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  color: var(--text-color);
+  transition: background-color 0.3s ease, color 0.3s ease; /* Smooth transition for theme change */
+}
+
+@keyframes gradientAnimation {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.container {
+  background: var(--container-bg);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px); /* Hỗ trợ Safari */
+  border-radius: 16px;
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  max-width: 550px;
+  width: 100%;
+  padding: 40px;
+  box-sizing: border-box;
+  border: 1px solid var(--container-border);
+  transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.header-controls {
+  display: flex;
+  justify-content: flex-end; /* Căn phải */
+  gap: 10px; /* Khoảng cách giữa các nút */
+  margin-bottom: 20px;
+}
+
+.btn-icon {
+  background: none;
+  border: none;
+  padding: 8px;
+  border-radius: 50%; /* Nút tròn */
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-icon svg {
+  width: 24px;
+  height: 24px;
+  color: var(--text-color); /* Màu icon */
+  transition: color 0.3s ease;
+}
+
+.btn-icon.toggle-btn {
+  background-color: var(--input-bg); /* Nền nút tương tự input */
+  border: 1px solid var(--input-border);
+  color: var(--text-color);
+  font-weight: 600;
+  padding: 8px 12px; /* Điều chỉnh padding cho nút văn bản */
+  border-radius: 8px; /* Bo tròn góc */
+}
+
+.btn-icon.toggle-btn:hover {
+  background-color: var(--browse-btn-hover-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+
+.app-logo {
+  height: 90px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+
+h1 {
+  font-weight: 700;
+  color: var(--button-primary-bg) !important; /* Sử dụng biến màu chủ đạo */
+  margin-bottom: 2.5rem !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.05);
+  transition: color 0.3s ease;
+}
+
+label {
+  font-weight: 600;
+  margin-bottom: 8px;
+  display: block;
+  color: var(--label-color);
+  transition: color 0.3s ease;
+}
+
+.form-control {
+  border-radius: 8px;
+  padding: 10px 15px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.075);
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out, background-color 0.3s ease, color 0.3s ease;
+  color: var(--text-color); /* Đảm bảo màu chữ trong input thay đổi */
+}
+
+.form-control:focus {
+  border-color: #80bdff;
+  outline: 0;
+  box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+  background-color: var(--input-bg); /* Giữ nguyên màu nền khi focus */
+}
+
+.custom-file-input {
+  position: relative;
+  display: flex;
+  align-items: center;
+  border-radius: 8px;
+  border: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+  overflow: hidden;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.custom-file-input input[type="file"] {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+  z-index: 2;
+}
+
+.custom-file-label {
+  display: block;
+  flex-grow: 1;
+  padding: 10px 15px;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--label-color);
+  background-color: transparent;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.custom-file-input::after {
+  content: "Duyệt...";
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 15px;
+  background-color: var(--browse-btn-bg);
+  border-left: 1px solid var(--input-border);
+  color: var(--label-color);
+  font-weight: 600;
+  cursor: pointer;
+  z-index: 1;
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+.custom-file-input:hover::after {
+  background-color: var(--browse-btn-hover-bg);
+}
+
+
+.btn {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 1.1rem;
+  transition: all 0.2s ease-in-out;
+  border: none;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  color: white; /* Đảm bảo chữ nút luôn trắng */
+}
+
+.btn-primary.btn-generate {
+  background-color: var(--button-primary-bg);
+}
+
+.btn-primary.btn-generate:hover {
+  background-color: var(--button-primary-hover-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.btn-success.btn-download {
+  background-color: var(--button-success-bg);
+  display: none;
+}
+
+.btn-success.btn-download:hover {
+  background-color: var(--button-success-hover-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(40, 167, 69, 0.3);
+}
+
+.btn-secondary.btn-back {
+  background-color: var(--button-secondary-bg);
+}
+
+.btn-secondary.btn-back:hover {
+  background-color: var(--button-secondary-hover-bg);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3);
+}
+
+
+#qrcode {
+  margin-top: 40px;
+  position: relative;
+  text-align: center;
+  padding: 20px;
+  border-radius: 12px;
+  background-color: var(--qr-area-bg);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+#qrcode canvas {
+  display: inline-block;
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+}
+
+/* Modal Styling */
+.modal-content {
+  background-color: var(--modal-bg);
+  color: var(--text-color);
+  border-radius: 12px;
+  border: 1px solid var(--modal-border-color);
+  backdrop-filter: blur(5px); /* Hiệu ứng glass cho modal */
+  -webkit-backdrop-filter: blur(5px);
+}
+
+.modal-header {
+  background-color: var(--modal-header-bg);
+  border-bottom: 1px solid var(--modal-border-color);
+  color: var(--text-color);
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+}
+
+.modal-title {
+  color: var(--text-color);
+}
+
+.modal-body {
+  color: var(--text-color);
+}
+
+.modal-footer {
+  border-top: 1px solid var(--modal-border-color);
+}
+
+.modal-footer .btn-primary {
+  background-color: var(--button-primary-bg);
+  border-color: var(--button-primary-bg);
+}
+
+.modal-footer .btn-primary:hover {
+  background-color: var(--button-primary-hover-bg);
+  border-color: var(--button-primary-hover-bg);
+}
