@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Roboto', sans-serif;
+      background: linear-gradient(to bottom, #ffecd2, #fcb69f);
+      color: #fae4e4;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      overflow: hidden;
+      position: relative;
+    }
+
+    h1 {
+      font-family: 'Pacifico', cursive;
+      font-size: 2.5rem;
+      margin-bottom: 20px;
+      color: #8b0000;
+      text-shadow: 2px 2px 6px #f7d9c4;
+    }
+
+    #countdown {
+      display: flex;
+      gap: 15px;
+      font-size: 1.4rem;
+      font-weight: bold;
+      flex-wrap: wrap;
+      justify-content: center;
+      margin-bottom: 30px;
+    }
+
+    .time-box {
+      background-color: rgba(255, 255, 255, 0.15);
+      border-radius: 12px;
+      padding: 15px 20px;
+      min-width: 100px;
+      text-align: center;
+      box-shadow: 0 0 10px #ec7c20;
+    }
+
+    .time-box span.value {
+      font-size: 2.5rem;
+      display: block;
+      color: #ffffff;
+    }
+
+    .time-box span.label {
+      font-size: 0.9rem;
+      color: #8b0000;
+    }
+
+    #toggleMusic {
+  margin-top: 30px;
+  margin-bottom: 250px;
+  font-size: 1.1rem;
+  padding: 12px 24px;
+  background: #b71c1c;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  box-shadow: 2px 2px 12px rgba(0, 0, 0, 0.5);
+  z-index: 2;
+  position: relative;
+}
+
+    #fireworks {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      color: yellow;
+      font-size: 3rem;
+      z-index: 9999;
+      animation: fadeIn 2s forwards;
+      text-shadow: 2px 2px 10px red;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    #bottom-image {
+  width: 550px;
+  max-width: 95vw;
+  z-index: 1;
+  opacity: 0.97;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  /* box-shadow: 0 0 60px rgba(0, 0, 0, 0.5); */
+}
+  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đếm Ngược Tết Nguyên Đán 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto&display=swap" rel="stylesheet">
+  
+</head>
+<body>
+  <h1>Đếm Ngược Tết Nguyên Đán 2026</h1>
+  <div id="countdown">
+    <div class="time-box">
+      <span class="value" id="days">00</span>
+      <span class="label">Ngày</span>
+    </div>
+    <div class="time-box">
+      <span class="value" id="hours">00</span>
+      <span class="label">Giờ</span>
+    </div>
+    <div class="time-box">
+      <span class="value" id="minutes">00</span>
+      <span class="label">Phút</span>
+    </div>
+    <div class="time-box">
+      <span class="value" id="seconds">00</span>
+      <span class="label">Giây</span>
+    </div>
+  </div>
+  <button id="toggleMusic"><i class="fas fa-music"></i> Bật nhạc</button>
+  <div id="fireworks">🎉 Chúc Mừng Năm Mới 2026! 🎊</div>
+  <audio id="tetMusic" loop>
+    <source src="./assets/music/tet-on-roi.m4a" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const music = document.getElementById("tetMusic");
+    const btn = document.getElementById("toggleMusic");
+    const fireworks = document.getElementById("fireworks");
+    let isPlaying = false;
+
+    btn.addEventListener("click", () => {
+      if (isPlaying) {
+        music.pause();
+        btn.innerHTML = '<i class="fas fa-music"></i> Bật nhạc';
+      } else {
+        music.play();
+        btn.innerHTML = '<i class="fas fa-music"></i> Tắt nhạc';
+      }
+      isPlaying = !isPlaying;
+    });
+
+    const countdown = () => {
+      const newYear = new Date("2026-02-17T00:00:00").getTime();
+      const now = new Date().getTime();
+      const distance = newYear - now;
+
+      if (distance <= 0) {
+        document.getElementById("countdown").style.display = "none";
+        fireworks.style.display = "flex";
+        
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("days").innerText = days;
+      document.getElementById("hours").innerText = hours;
+      document.getElementById("minutes").innerText = minutes;
+      document.getElementById("seconds").innerText = seconds;
+    };
+
+    setInterval(countdown, 1000);
+    countdown();
+  </script>
+
+  <img id="bottom-image" src="./assets/img/tet-nguyen-dan.png" alt="Gia đình luộc bánh chưng" />
+</body>
+</html>
