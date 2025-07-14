@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <!-- Bootstrap & jQuery -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <style>
+    body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  background: linear-gradient(to bottom, #ffecd2, #fcb69f);
+  color: #8b0000;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  min-height: 100vh;
+  overflow-x: hidden;
+  padding: 5vh 5vw;
+  position: relative;
+  box-sizing: border-box;
+}
+
+    h1 {
+  font-family: 'Pacifico', cursive;
+  font-size: clamp(2.2rem, 5vw, 3.2rem);
+  margin-bottom: 40px;
+  color: #d60000;
+  text-shadow: 3px 3px 6px rgba(255, 200, 200, 0.8);
+  line-height: 1.4;
+}
+
+    #countdown {
+  display: flex;
+  gap: 4vw;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  font-weight: bold;
+  flex-wrap: wrap;
+  justify-content: center;
+  margin-bottom: 5vh;
+  width: 100%;
+  max-width: 900px;
+}
+
+    .time-box {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 3vh 2vw;
+  flex: 1 1 100px;
+  text-align: center;
+  box-shadow: 0 0 10px #ffcc00;
+  min-width: 80px;
+  max-width: 180px;
+}
+
+    .time-box span.value {
+  font-size: clamp(2rem, 5vw, 3rem);
+  display: block;
+  color: #ffffff;
+}
+
+    .time-box span.label {
+      font-size: 0.9rem;
+      color: #8b0000;
+    }
+
+    #toggleMusic {
+  background: transparent;
+  color: #8b0000;
+  border: none;
+  cursor: pointer;
+  box-shadow: none;
+  z-index: 3;
+  position: absolute;
+  right: 1rem;
+  top: 1rem;
+  font-size: 1.8rem;
+}
+
+    #fireworks {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0, 0, 0, 0.85);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      color: yellow;
+      font-size: 3rem;
+      z-index: 9999;
+      animation: fadeIn 2s forwards;
+      text-shadow: 2px 2px 10px red;
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    #bottom-image {
+  width: 550px;
+  max-width: 95vw;
+  z-index: 1;
+  opacity: 0.97;
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+}
+  
+</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đếm Ngược Tết Nguyên Đán 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Roboto&display=swap" rel="stylesheet">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./assets/img/tet.png" type="image/png">
+
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <meta name="theme-color" content="#fcb69f">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Tết 2026">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <meta property="og:title" content="Đếm Ngược Tết Nguyên Đán 2026">
+  <meta property="og:description" content="Cùng đếm ngược đến thời khắc giao thừa năm 2026 và tận hưởng không khí Tết sum vầy!">
+  <meta property="og:image" content="https://i.imgur.com/mZwzYqS.png">
+  <meta property="og:type" content="website">
+</head>
+<body class="container-fluid px-3 px-md-5">
+  <h1>Đếm Ngược<br />Tết Nguyên Đán 2026</h1>
+  <div id="countdown" class="w-100">
+    <div class="time-box">
+      <span class="value" id="days">00</span>
+      <span class="label">Ngày</span>
+    </div>
+    <div class="time-box">
+      <span class="value" id="hours">00</span>
+      <span class="label">Giờ</span>
+    </div>
+    <div class="time-box">
+      <span class="value" id="minutes">00</span>
+      <span class="label">Phút</span>
+    </div>
+    <div class="time-box">
+      <span class="value" id="seconds">00</span>
+      <span class="label">Giây</span>
+    </div>
+  </div>
+  <button id="toggleMusic"><i class="fas fa-volume-up"></i></button>
+  <div id="fireworks">🎉 Chúc Mừng Năm Mới 2026! 🎊</div>
+  <audio id="tetMusic" loop>
+    <source src="./assets/music/tet-on-roi.m4a" type="audio/mpeg" />
+  </audio>
+
+  <script>
+    const music = document.getElementById("tetMusic");
+    const btn = document.getElementById("toggleMusic");
+    const fireworks = document.getElementById("fireworks");
+    let isPlaying = false;
+
+    btn.addEventListener("click", () => {
+      if (isPlaying) {
+        music.pause();
+        btn.innerHTML = '<i class="fas fa-music"></i> Bật nhạc';
+      } else {
+        music.play();
+        btn.innerHTML = '<i class="fas fa-music"></i> Tắt nhạc';
+      }
+      isPlaying = !isPlaying;
+    });
+
+    const countdown = () => {
+      const newYear = new Date("2026-02-17T00:00:00").getTime();
+      const now = new Date().getTime();
+      const distance = newYear - now;
+
+      if (distance <= 0) {
+        document.getElementById("countdown").style.display = "none";
+        fireworks.style.display = "flex";
+        
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      document.getElementById("days").innerText = days;
+      document.getElementById("hours").innerText = hours;
+      document.getElementById("minutes").innerText = minutes;
+      document.getElementById("seconds").innerText = seconds;
+    };
+
+    setInterval(countdown, 1000);
+    countdown();
+  </script>
+
+  <img id="bottom-image" src="./assets/img/tet-nguyen-dan.png" alt="Gia đình luộc bánh chưng" />
+</body>
+</html>
