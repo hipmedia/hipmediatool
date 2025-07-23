@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title data-lang-key="appTitle">Tạo mã QR chuyên nghiệp</title>
+  <link rel="icon" href="./image/logo.png" type="image/png">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/qrcode/build/qrcode.min.js"></script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <div class="header-controls">
+      <button id="themeToggleBtn" class="btn btn-icon toggle-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="M4.93 4.93l1.41 1.41"/><path d="M17.66 17.66l1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="M6.34 17.66l-1.41 1.41"/><path d="M19.07 4.93l-1.41 1.41"/></svg>
+      </button>
+      <button id="langToggleBtn" class="btn btn-icon toggle-btn" data-lang-key="englishLangBtn">English</button>
+    </div>
+
+    <div class="text-center mb-4">
+      <img src="./image/logo.png" alt="Logo" class="app-logo">
+    </div>
+    <h1 class="text-center text-primary mb-5" data-lang-key="mainHeading">Tạo mã QR từ liên kết</h1>
+
+    <div class="mb-3">
+      <label for="linkInput" class="form-label" data-lang-key="linkLabel">Liên kết của bạn</label>
+      <input type="text" id="linkInput" class="form-control" placeholder="Ví dụ: https://yourwebsite.com" data-lang-key="linkPlaceholder">
+    </div>
+
+    <div class="mb-3">
+      <label class="form-label" data-lang-key="logoUploadLabel">Tải lên ảnh logo (tùy chọn)</label>
+      <div class="custom-file-input">
+        <input type="file" id="logoInput" accept="image/*" onchange="updateFileName(this)">
+        <span class="custom-file-label" id="fileLabel" data-lang-key="logoUploadPlaceholder">Chọn ảnh logo...</span>
+      </div>
+    </div>
+
+    <div class="mb-4">
+        <label for="logoUrlInput" class="form-label" data-lang-key="logoUrlLabel">Hoặc dán URL ảnh logo</label>
+        <input type="text" id="logoUrlInput" class="form-control" placeholder="Ví dụ: https://yourimage.com/logo.png" data-lang-key="logoUrlPlaceholder">
+    </div>
+
+    <div class="d-grid gap-3">
+      <button class="btn btn-primary btn-generate" onclick="generateQRCode()" data-lang-key="generateBtn">Tạo mã QR</button>
+      <button id="downloadBtn" class="btn btn-success btn-download" onclick="downloadQRCode()" data-lang-key="downloadBtn"><i class="fa-solid fa-download"></i>Tải mã QR</button>
+      <button class="btn btn-secondary btn-back" onclick="window.location.href='index.html'" data-lang-key="backBtn">Quay lại trang chủ</button>
+    </div>
+
+    <div id="qrcode" class="mt-5 text-center"></div>
+  </div>
+
+  <!-- Custom Alert Modal -->
+  <div id="customAlertModal" class="modal fade" tabindex="-1" aria-labelledby="customAlertModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="customAlertModalLabel">Thông báo</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body" id="customAlertModalBody">
+          <!-- Message will be inserted here -->
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-primary" data-bs-dismiss="modal">Đóng</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

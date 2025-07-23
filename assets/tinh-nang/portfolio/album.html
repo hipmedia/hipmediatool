@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Album Ảnh</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+            color: #E5E7EB;
+        }
+        .photo-grid-item {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .photo-grid-item:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.3);
+        }
+        .lightbox {
+            transition: opacity 0.3s ease;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <header class="bg-gray-900 py-4 shadow-lg">
+        <div class="container mx-auto px-6 flex justify-between items-center">
+            <a href="index.html" class="text-lg font-bold text-white hover:text-sky-400 transition-colors">&larr; Quay lại trang chủ</a>
+            <h1 id="album-title" class="text-2xl font-bold text-white text-center"></h1>
+            <div class="w-1/4"></div> <!-- Spacer -->
+        </div>
+    </header>
+
+    <main class="container mx-auto px-6 py-12">
+        <div id="photo-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            <!-- Photos will be loaded here by JavaScript -->
+        </div>
+        <div id="loading" class="text-center py-20">
+            <p class="text-xl">Đang tải album...</p>
+        </div>
+        <div id="not-found" class="text-center py-20 hidden">
+            <h2 class="text-3xl font-bold text-red-500">Không tìm thấy Album</h2>
+            <p class="text-lg mt-2">Album bạn yêu cầu không tồn tại. Vui lòng kiểm tra lại đường dẫn.</p>
+            <a href="index.html" class="mt-6 inline-block bg-sky-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-sky-600 transition-colors">Về trang chủ</a>
+        </div>
+    </main>
+
+    <!-- Lightbox Modal -->
+    <div id="lightbox" class="lightbox fixed inset-0 bg-black/90 z-50 flex items-center justify-center opacity-0 pointer-events-none p-4">
+        <img id="lightbox-img" src="" alt="Hình ảnh phóng to" class="max-w-full max-h-full object-contain">
+        <button id="close-lightbox" class="absolute top-4 right-6 text-white text-4xl font-bold">&times;</button>
+        <button id="prev-lightbox" class="absolute left-4 top-1/2 -translate-y-1/2 text-white text-4xl font-bold p-4">&lsaquo;</button>
+        <button id="next-lightbox" class="absolute right-4 top-1/2 -translate-y-1/2 text-white text-4xl font-bold p-4">&rsaquo;</button>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DATABASE MẪU CHO CÁC ALBUM ---
+            // Bạn sẽ thay thế các URL ảnh placeholder này bằng URL ảnh thật của mình.
+            const albums = {
+                'chan-dung': {
+                    title: 'Album Ảnh Chân Dung',
+                    images: [
+                        'https://placehold.co/1200x800/3B82F6/FFFFFF?text=Chân+Dung+1',
+                        'https://placehold.co/1200x800/3B82F6/FFFFFF?text=Chân+Dung+2',
+                        'https://placehold.co/1200x800/3B82F6/FFFFFF?text=Chân+Dung+3',
+                        'https://placehold.co/1200x800/3B82F6/FFFFFF?text=Chân+Dung+4',
+                        'https://placehold.co/1200x800/3B82F6/FFFFFF?text=Chân+Dung+5',
+                        'https://placehold.co/1200x800/3B82F6/FFFFFF?text=Chân+Dung+6',
+                        'https://placehold.co/1200x800/3B82F6/FFFFFF?text=Chân+Dung+7',
+                        'https://placehold.co/1200x800/3B82F6/FFFFFF?text=Chân+Dung+8',
+                    ]
+                },
+                'phong-canh': {
+                    title: 'Album Ảnh Phong Cảnh',
+                    images: [
+                        'https://placehold.co/1200x800/10B981/FFFFFF?text=Phong+Cảnh+1',
+                        'https://placehold.co/1200x800/10B981/FFFFFF?text=Phong+Cảnh+2',
+                        'https://placehold.co/1200x800/10B981/FFFFFF?text=Phong+Cảnh+3',
+                        'https://placehold.co/1200x800/10B981/FFFFFF?text=Phong+Cảnh+4',
+                    ]
+                },
+                'su-kien': {
+                    title: 'Album Ảnh Sự Kiện',
+                    images: [ 'https://placehold.co/1200x800/F59E0B/FFFFFF?text=Sự+Kiện+1' ]
+                },
+                'duong-pho': {
+                    title: 'Album Ảnh Đường Phố',
+                    images: [ 'https://placehold.co/1200x800/6366F1/FFFFFF?text=Đường+Phố+1' ]
+                },
+                'cuoi': {
+                    title: 'Album Ảnh Cưới',
+                    images: [ 'https://placehold.co/1200x800/EC4899/FFFFFF?text=Cưới+1' ]
+                },
+                'san-pham': {
+                    title: 'Album Ảnh Sản Phẩm',
+                    images: [ 'https://placehold.co/1200x800/84CC16/FFFFFF?text=Sản+Phẩm+1' ]
+                }
+            };
+
+            const photoGrid = document.getElementById('photo-grid');
+            const albumTitleEl = document.getElementById('album-title');
+            const loadingEl = document.getElementById('loading');
+            const notFoundEl = document.getElementById('not-found');
+            let currentAlbumImages = [];
+            let currentImageIndex = 0;
+
+            // --- Load Album Data ---
+            const params = new URLSearchParams(window.location.search);
+            const albumKey = params.get('album');
+            const albumData = albums[albumKey];
+
+            if (albumData) {
+                albumTitleEl.textContent = albumData.title;
+                currentAlbumImages = albumData.images;
+                currentAlbumImages.forEach((src, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'photo-grid-item rounded-lg overflow-hidden cursor-pointer';
+                    item.innerHTML = `<img src="${src}" alt="${albumData.title} - ${index + 1}" class="w-full h-full object-cover">`;
+                    item.addEventListener('click', () => openLightbox(index));
+                    photoGrid.appendChild(item);
+                });
+                loadingEl.classList.add('hidden');
+            } else {
+                loadingEl.classList.add('hidden');
+                notFoundEl.classList.remove('hidden');
+            }
+
+            // --- Lightbox Logic ---
+            const lightbox = document.getElementById('lightbox');
+            const lightboxImg = document.getElementById('lightbox-img');
+            const closeLightboxBtn = document.getElementById('close-lightbox');
+            const prevBtn = document.getElementById('prev-lightbox');
+            const nextBtn = document.getElementById('next-lightbox');
+
+            function openLightbox(index) {
+                currentImageIndex = index;
+                updateLightboxImage();
+                lightbox.classList.remove('opacity-0', 'pointer-events-none');
+            }
+
+            function closeLightbox() {
+                lightbox.classList.add('opacity-0', 'pointer-events-none');
+            }
+
+            function updateLightboxImage() {
+                lightboxImg.src = currentAlbumImages[currentImageIndex];
+            }
+
+            function showPrevImage() {
+                currentImageIndex = (currentImageIndex - 1 + currentAlbumImages.length) % currentAlbumImages.length;
+                updateLightboxImage();
+            }
+
+            function showNextImage() {
+                currentImageIndex = (currentImageIndex + 1) % currentAlbumImages.length;
+                updateLightboxImage();
+            }
+
+            closeLightboxBtn.addEventListener('click', closeLightbox);
+            lightbox.addEventListener('click', (e) => {
+                if (e.target === lightbox) closeLightbox();
+            });
+            prevBtn.addEventListener('click', showPrevImage);
+            nextBtn.addEventListener('click', showNextImage);
+
+            document.addEventListener('keydown', (e) => {
+                if (lightbox.classList.contains('pointer-events-none')) return;
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === 'ArrowLeft') showPrevImage();
+                if (e.key === 'ArrowRight') showNextImage();
+            });
+        });
+    </script>
+</body>
+</html>

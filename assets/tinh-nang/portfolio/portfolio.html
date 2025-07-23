@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="vi" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Portfolio</title>
+    <link rel="icon" href="./assets/image/logo.png" type="image/png">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827; /* Dark background */
+            color: #E5E7EB; /* Light text */
+        }
+        .nav-link {
+            transition: color 0.3s;
+        }
+        .nav-link:hover {
+            color: #38BDF8; /* Light blue on hover */
+        }
+        .gallery-item {
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+        }
+        .gallery-item:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+        }
+        .gallery-item .overlay {
+            position: absolute;
+            inset: 0;
+            background-color: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.25rem;
+            font-weight: bold;
+            text-align: center;
+            padding: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .gallery-item:hover .overlay {
+            opacity: 1;
+        }
+        .modal {
+            transition: opacity 0.3s ease;
+        }
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+        }
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .tab-button {
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .tab-button.active {
+            background-color: #0ea5e9; /* sky-500 */
+            color: white;
+        }
+    </style>
+</head>
+<body class="antialiased">
+
+    <!-- Header & Navigation -->
+    <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <a href="#home" class="text-2xl font-bold text-white">Hip Nguyen</a>
+            <nav class="hidden md:flex space-x-8">
+                <a href="#gallery" class="nav-link text-gray-300">Thư viện</a>
+                <a href="#about" class="nav-link text-gray-300">Giới thiệu</a>
+                <a href="#services" class="nav-link text-gray-300">Dịch vụ</a>
+                <a href="#contact" class="nav-link text-gray-300">Liên hệ</a>
+            </nav>
+            <button id="mobile-menu-button" class="md:hidden text-white focus:outline-none">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+            </button>
+        </div>
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden px-6 pb-4">
+            <a href="#gallery" class="block py-2 nav-link text-gray-300">Thư viện</a>
+            <a href="#about" class="block py-2 nav-link text-gray-300">Giới thiệu</a>
+            <a href="#services" class="block py-2 nav-link text-gray-300">Dịch vụ</a>
+            <a href="#contact" class="block py-2 nav-link text-gray-300">Liên hệ</a>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main>
+        <!-- Hero Section -->
+        <section id="home" class="h-screen flex items-center justify-center bg-cover bg-center" style="background-image: url('./assets/image/anh-bia.jpg');">
+            <div class="text-center bg-black/50 p-8 rounded-lg">
+                <h1 class="text-4xl md:text-6xl font-bold text-white mb-4">Bắt trọn khoảnh khắc, Kể trọn câu chuyện</h1>
+                <p class="text-lg md:text-xl text-gray-200">Nhiếp ảnh gia & Nhà quay phim chuyên nghiệp</p>
+            </div>
+        </section>
+
+        <!-- Gallery Section -->
+        <section id="gallery" class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-8 fade-in">Tác phẩm của tôi</h2>
+                
+                <!-- Gallery Tabs -->
+                <div class="flex justify-center mb-12 fade-in">
+                    <div class="bg-gray-800 rounded-lg p-1 flex space-x-1">
+                        <button id="photo-tab" class="tab-button active px-6 py-2 rounded-md font-semibold">Ảnh</button>
+                        <button id="video-tab" class="tab-button px-6 py-2 rounded-md font-semibold">Video</button>
+                    </div>
+                </div>
+
+                <!-- Photo Gallery -->
+                <div id="photo-gallery">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Album 1 -->
+                        <a href="album.html?album=chan-dung" class="gallery-item rounded-lg block fade-in">
+                            <img src="./assets/image/HIP09276.jpg" alt="Album Chân Dung" class="w-full h-full object-cover">
+                            <div class="overlay">Album Chân Dung</div>
+                        </a>
+                        <!-- Album 2 -->
+                        <a href="album.html?album=phong-canh" class="gallery-item rounded-lg block fade-in">
+                            <img src="./assets/image/HIP09347.jpg" alt="Album Phong Cảnh" class="w-full h-full object-cover">
+                            <div class="overlay">Album Phong Cảnh</div>
+                        </a>
+                        <!-- Album 3 -->
+                        <a href="album.html?album=su-kien" class="gallery-item rounded-lg block fade-in">
+                            <img src="./assets/image/HIP09439.jpg" alt="Album Sự Kiện" class="w-full h-full object-cover">
+                            <div class="overlay">Album Sự Kiện</div>
+                        </a>
+                        <!-- Album 4 -->
+                        <a href="album.html?album=duong-pho" class="gallery-item rounded-lg block fade-in">
+                            <img src="https://placehold.co/600x400/6366F1/FFFFFF?text=Album+Đường+Phố" alt="Album Đường Phố" class="w-full h-full object-cover">
+                            <div class="overlay">Album Đường Phố</div>
+                        </a>
+                        <!-- Album 5 -->
+                        <a href="album.html?album=cuoi" class="gallery-item rounded-lg block fade-in">
+                            <img src="https://placehold.co/600x400/EC4899/FFFFFF?text=Album+Cưới" alt="Album Cưới" class="w-full h-full object-cover">
+                            <div class="overlay">Album Cưới</div>
+                        </a>
+                        <!-- Album 6 -->
+                        <a href="album.html?album=san-pham" class="gallery-item rounded-lg block fade-in">
+                            <img src="https://placehold.co/600x400/84CC16/FFFFFF?text=Album+Sản+Phẩm" alt="Album Sản Phẩm" class="w-full h-full object-cover">
+                            <div class="overlay">Album Sản Phẩm</div>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Video Gallery (hidden by default) -->
+                <div id="video-gallery" class="hidden">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <!-- Video Item 1 -->
+                        <div class="gallery-item rounded-lg overflow-hidden cursor-pointer relative fade-in" data-type="video" data-src="https://www.youtube.com/embed/YwzHo5mmrpc?si=OE-8WSY2RZxpE1ZT">
+                            <img src="https://placehold.co/600x400/111827/FFFFFF?text=Loading..." alt="Video cưới" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                 <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                            </div>
+                        </div>
+                        <!-- Video Item 2 -->
+                        <div class="gallery-item rounded-lg overflow-hidden cursor-pointer relative fade-in" data-type="video" data-src="https://www.youtube.com/embed/B1nTF4hTmps?si=O_un8ExzrkuxYvwR">
+                            <img src="https://placehold.co/600x400/111827/FFFFFF?text=Loading..." alt="Video sản phẩm" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                 <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                            </div>
+                        </div>
+                        <!-- Video Item 3 -->
+                        <div class="gallery-item rounded-lg overflow-hidden cursor-pointer relative fade-in" data-type="video" data-src="https://www.youtube.com/embed/leWL8mF_fWE?si=A-Iv6nVxtQx9wAMx">
+                            <img src="https://placehold.co/600x400/111827/FFFFFF?text=Loading..." alt="Video sự kiện" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                 <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                            </div>
+                        </div>
+                        <!-- Video Item 4 -->
+                        <div class="gallery-item rounded-lg overflow-hidden cursor-pointer relative fade-in" data-type="video" data-src="https://www.youtube.com/embed/aqz-KE-bpKQ">
+                            <img src="https://placehold.co/600x400/111827/FFFFFF?text=Loading..." alt="Video du lịch" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                 <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                            </div>
+                        </div>
+                        <!-- Video Item 5 -->
+                        <div class="gallery-item rounded-lg overflow-hidden cursor-pointer relative fade-in" data-type="video" data-src="https://www.youtube.com/embed/6_pru8U2RmM">
+                            <img src="https://placehold.co/600x400/111827/FFFFFF?text=Loading..." alt="Video flycam" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                 <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                            </div>
+                        </div>
+                        <!-- Video Item 6 -->
+                        <div class="gallery-item rounded-lg overflow-hidden cursor-pointer relative fade-in" data-type="video" data-src="https://www.youtube.com/embed/Y_plhk1tZ_4">
+                            <img src="https://placehold.co/600x400/111827/FFFFFF?text=Loading..." alt="Video phim ngắn" class="w-full h-full object-cover">
+                            <div class="absolute inset-0 bg-black/30 flex items-center justify-center">
+                                 <svg class="w-16 h-16 text-white" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM9.555 7.168A1 1 0 008 8v4a1 1 0 001.555.832l3-2a1 1 0 000-1.664l-3-2z" clip-rule="evenodd"></path></svg>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- About Section -->
+        <section id="about" class="py-20">
+            <div class="container mx-auto px-6">
+                <div class="flex flex-col md:flex-row items-center gap-12">
+                    <div class="md:w-1/3 fade-in">
+                        <img src="./assets/image/avatar.jpg" alt="Ảnh của bạn" class="rounded-full shadow-lg mx-auto">
+                    </div>
+                    <div class="md:w-2/3 text-center md:text-left fade-in">
+                        <h2 class="text-3xl md:text-4xl font-bold mb-4">Chào bạn, tôi là Nguyễn Mạnh ( Hip Nguyen )</h2>
+                        <p class="text-lg text-gray-300 mb-4">
+                            Với niềm đam mê mãnh liệt dành cho nhiếp ảnh và quay phim, tôi luôn tìm kiếm những góc nhìn độc đáo để kể lại những câu chuyện chân thực và đầy cảm xúc. Mỗi bức ảnh, mỗi thước phim không chỉ là sản phẩm kỹ thuật mà còn là nơi tôi gửi gắm tâm hồn và sự sáng tạo.
+                        </p>
+                        <p class="text-lg text-gray-300">
+                            Tôi có kinh nghiệm trong nhiều lĩnh vực từ chụp ảnh chân dung, sự kiện, cưới hỏi đến quay phim quảng cáo, video âm nhạc. Hãy cùng tôi tạo nên những tác phẩm ấn tượng!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Services Section -->
+        <section id="services" class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <h2 class="text-3xl md:text-4xl font-bold text-center mb-12 fade-in">Dịch vụ của tôi</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <!-- Service 1: Photography -->
+                    <div class="bg-gray-800 p-8 rounded-lg text-center fade-in">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <h3 class="text-2xl font-bold mb-2">Nhiếp ảnh</h3>
+                        <p class="text-gray-400">Chụp ảnh chân dung, gia đình, sự kiện, cưới hỏi, sản phẩm, thời trang và phong cảnh. Mang đến những bức ảnh chất lượng cao, giàu cảm xúc.</p>
+                    </div>
+                    <!-- Service 2: Videography -->
+                    <div class="bg-gray-800 p-8 rounded-lg text-center fade-in">
+                        <svg class="w-12 h-12 mx-auto mb-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <h3 class="text-2xl font-bold mb-2">Quay phim</h3>
+                        <p class="text-gray-400">Sản xuất video quảng cáo, highlight sự kiện, video cưới, video âm nhạc, phim ngắn. Kịch bản, quay phim và hậu kỳ chuyên nghiệp.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Contact Section -->
+        <section id="contact" class="py-20">
+            <div class="container mx-auto px-6 text-center">
+                <h2 class="text-3xl md:text-4xl font-bold mb-4 fade-in">Liên hệ với tôi</h2>
+                <p class="text-lg text-gray-300 mb-8 fade-in">Bạn có ý tưởng? Hãy cùng nhau biến nó thành hiện thực. <br> Contact cho tôi qua số điện thoại: 0775.775.698 <br>  Hoặc qua email: </p>
+                <a href="mailto:your.email@example.com" class="inline-block bg-sky-500 text-white font-bold py-3 px-8 rounded-lg hover:bg-sky-600 transition-colors duration-300 fade-in">
+                    hipnguyen545@gmail.com
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 py-6">
+        <div class="container mx-auto px-6 text-center text-gray-400">
+            <p>&copy; <span id="year"></span> Hip Nguyen. All Rights Reserved.</p>
+        </div>
+    </footer>
+
+    <!-- Video Modal -->
+    <div id="video-modal" class="modal fixed inset-0 bg-black/80 z-50 flex items-center justify-center opacity-0 pointer-events-none p-4">
+        <div class="relative w-full max-w-4xl max-h-full">
+            <div class="aspect-video w-full">
+                 <iframe id="modal-video-player" class="w-full h-full" src="" frameborder="0" allow="autoplay; fullscreen; picture-in-picture" allowfullscreen></iframe>
+            </div>
+            <button id="close-modal" class="absolute -top-2 -right-2 md:top-0 md:right-0 md:-mr-10 text-white text-4xl font-bold">&times;</button>
+        </div>
+    </div>
+
+    <script src="script.js">
+    
+    </script>
+</body>
+</html>
