@@ -1,22 +1,20 @@
 /* --- Cài đặt chung & Tối ưu cho di động trước (Mobile-First) --- */
+html {
+  height: 100%;
+}
+
 body {
   font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
   color: #fff;
   margin: 0;
-  display: flex; /* Sử dụng flexbox để căn giữa */
-  justify-content: center; /* Căn giữa theo chiều ngang */
-  align-items: flex-start; /* Căn trên cùng */
-  min-height: 100vh; /* Chiều cao tối thiểu bằng chiều cao màn hình */
+  min-height: 100%; /* Đảm bảo body luôn cao bằng màn hình */
   transition: background 0.7s ease-in-out;
 }
 
 .weather-container {
-  padding: 20px;
+  padding: 25px 20px; /* Tăng padding trên dưới */
   box-sizing: border-box;
-  width: 100%; /* Chiếm toàn bộ chiều rộng trên di động */
-  max-width: 400px; /* Chiều rộng tối đa cho màn hình lớn hơn */
-  margin-top: 20px; /* Thêm khoảng cách ở trên */
-  margin-bottom: 20px;
+  width: 100%; /* Chiếm toàn bộ chiều rộng */
 }
 
 /* --- Theme theo thời tiết --- */
@@ -45,7 +43,7 @@ body {
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
-  font-size: 16px; /* Tăng kích thước font một chút */
+  font-size: 16px;
 }
 
 #cityInput::placeholder {
@@ -56,7 +54,7 @@ body {
   border: none;
   background: none;
   color: #fff;
-  font-size: 20px; /* Tăng kích thước icon */
+  font-size: 20px;
   cursor: pointer;
   padding: 0 10px;
 }
@@ -67,24 +65,24 @@ body {
 }
 
 .current-weather h2 {
-  font-size: 28px; /* Tăng kích thước font */
+  font-size: 28px;
   margin: 0;
   font-weight: 500;
 }
 
 .current-weather .icon {
-  font-size: 75px; /* Tăng kích thước icon */
+  font-size: 75px;
   margin: 20px 0;
 }
 
 .current-weather .temp {
-  font-size: 50px; /* Tăng kích thước font */
+  font-size: 50px;
   font-weight: 700;
   margin: 0;
 }
 
 .current-weather .description {
-  font-size: 20px; /* Tăng kích thước font */
+  font-size: 20px;
   text-transform: capitalize;
   margin-top: 5px;
 }
@@ -104,7 +102,7 @@ body {
 
 .details p {
   margin: 0;
-  font-size: 15px; /* Tăng kích thước font */
+  font-size: 15px;
 }
 
 .details .value {
@@ -128,7 +126,7 @@ body {
 .forecast-days {
   display: flex;
   justify-content: space-between;
-  gap: 10px; /* Thêm khoảng cách giữa các ngày */
+  gap: 10px;
 }
 
 .day {
@@ -166,14 +164,21 @@ body {
 }
 
 
-/* --- Tối ưu cho màn hình máy tính (Desktop) --- */
+/* --- Tối ưu cho màn hình MÁY TÍNH --- */
 @media (min-width: 480px) {
+  body {
+    /* Căn giữa container trên màn hình lớn */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
   .weather-container {
-    /* Cho phép container lớn hơn một chút trên màn hình desktop */
+    width: 100%;
     max-width: 450px; 
-    padding: 25px;
-    margin-top: 50px; /* Tăng khoảng cách với cạnh trên */
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Thêm đổ bóng cho đẹp hơn */
-    border-radius: 15px; /* Bo góc cho container */
+    border-radius: 15px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    /* Giới hạn chiều cao để tránh bị dài quá */
+    max-height: 90vh;
+    overflow-y: auto; /* Thêm cuộn nếu nội dung dài */
   }
 }
