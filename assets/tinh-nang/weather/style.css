@@ -1,15 +1,22 @@
-/* --- Cài đặt chung --- */
+/* --- Cài đặt chung & Tối ưu cho di động trước (Mobile-First) --- */
 body {
   font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
   color: #fff;
-  width: 320px;
   margin: 0;
+  display: flex; /* Sử dụng flexbox để căn giữa */
+  justify-content: center; /* Căn giữa theo chiều ngang */
+  align-items: flex-start; /* Căn trên cùng */
+  min-height: 100vh; /* Chiều cao tối thiểu bằng chiều cao màn hình */
   transition: background 0.7s ease-in-out;
 }
 
 .weather-container {
   padding: 20px;
   box-sizing: border-box;
+  width: 100%; /* Chiếm toàn bộ chiều rộng trên di động */
+  max-width: 400px; /* Chiều rộng tối đa cho màn hình lớn hơn */
+  margin-top: 20px; /* Thêm khoảng cách ở trên */
+  margin-bottom: 20px;
 }
 
 /* --- Theme theo thời tiết --- */
@@ -38,7 +45,7 @@ body {
   border-radius: 20px;
   background: rgba(255, 255, 255, 0.2);
   color: #fff;
-  font-size: 14px;
+  font-size: 16px; /* Tăng kích thước font một chút */
 }
 
 #cityInput::placeholder {
@@ -49,7 +56,7 @@ body {
   border: none;
   background: none;
   color: #fff;
-  font-size: 18px;
+  font-size: 20px; /* Tăng kích thước icon */
   cursor: pointer;
   padding: 0 10px;
 }
@@ -60,24 +67,24 @@ body {
 }
 
 .current-weather h2 {
-  font-size: 24px;
+  font-size: 28px; /* Tăng kích thước font */
   margin: 0;
   font-weight: 500;
 }
 
 .current-weather .icon {
-  font-size: 70px;
-  margin: 15px 0;
+  font-size: 75px; /* Tăng kích thước icon */
+  margin: 20px 0;
 }
 
 .current-weather .temp {
-  font-size: 45px;
+  font-size: 50px; /* Tăng kích thước font */
   font-weight: 700;
   margin: 0;
 }
 
 .current-weather .description {
-  font-size: 18px;
+  font-size: 20px; /* Tăng kích thước font */
   text-transform: capitalize;
   margin-top: 5px;
 }
@@ -85,9 +92,9 @@ body {
 .details {
   display: flex;
   justify-content: space-around;
-  margin-top: 20px;
+  margin-top: 25px;
   background: rgba(0, 0, 0, 0.1);
-  padding: 10px;
+  padding: 15px;
   border-radius: 12px;
 }
 
@@ -97,7 +104,7 @@ body {
 
 .details p {
   margin: 0;
-  font-size: 14px;
+  font-size: 15px; /* Tăng kích thước font */
 }
 
 .details .value {
@@ -106,20 +113,22 @@ body {
 
 /* --- Dự báo ngày tới --- */
 .forecast {
-  margin-top: 25px;
+  margin-top: 30px;
   border-top: 1px solid rgba(255, 255, 255, 0.3);
-  padding-top: 15px;
+  padding-top: 20px;
 }
 
 .forecast h4 {
   text-align: center;
-  margin: 0 0 10px 0;
+  margin: 0 0 15px 0;
   font-weight: 500;
+  font-size: 18px;
 }
 
 .forecast-days {
   display: flex;
   justify-content: space-between;
+  gap: 10px; /* Thêm khoảng cách giữa các ngày */
 }
 
 .day {
@@ -136,22 +145,35 @@ body {
 
 .day .date {
   font-weight: bold;
-  font-size: 14px;
+  font-size: 15px;
 }
 
 .day .icon {
-  font-size: 24px;
-  margin: 5px 0;
+  font-size: 28px;
+  margin: 8px 0;
 }
 
 .day .temp {
-  font-size: 16px;
+  font-size: 17px;
   font-weight: 500;
 }
 
 /* --- Thông báo --- */
 .message {
   text-align: center;
-  padding: 40px 0;
-  font-size: 16px;
+  padding: 50px 0;
+  font-size: 18px;
+}
+
+
+/* --- Tối ưu cho màn hình máy tính (Desktop) --- */
+@media (min-width: 480px) {
+  .weather-container {
+    /* Cho phép container lớn hơn một chút trên màn hình desktop */
+    max-width: 450px; 
+    padding: 25px;
+    margin-top: 50px; /* Tăng khoảng cách với cạnh trên */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Thêm đổ bóng cho đẹp hơn */
+    border-radius: 15px; /* Bo góc cho container */
+  }
 }
