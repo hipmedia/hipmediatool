@@ -1,0 +1,157 @@
+/* --- Cài đặt chung --- */
+body {
+  font-family: 'Segoe UI', 'Helvetica Neue', sans-serif;
+  color: #fff;
+  width: 320px;
+  margin: 0;
+  transition: background 0.7s ease-in-out;
+}
+
+.weather-container {
+  padding: 20px;
+  box-sizing: border-box;
+}
+
+/* --- Theme theo thời tiết --- */
+.theme-clear { background: linear-gradient(to top, #ffb75e, #ed8f03); }
+.theme-clouds { background: linear-gradient(to top, #bdc3c7, #2c3e50); }
+.theme-rain { background: linear-gradient(to top, #2c3e50, #40546d); }
+.theme-drizzle { background: linear-gradient(to top, #8990a5, #b6c2d9); }
+.theme-snow { background: linear-gradient(to top, #e6dada, #a7c1d8); }
+.theme-thunderstorm { background: linear-gradient(to top, #232526, #414345); }
+.theme-atmosphere { background: linear-gradient(to top, #a5a9b3, #6e778a); }
+.default-theme { background: linear-gradient(to top, #74ebd5, #ACB6E5); }
+
+
+/* --- Hộp tìm kiếm --- */
+.search-box {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+#cityInput {
+  flex-grow: 1;
+  border: none;
+  outline: none;
+  padding: 10px 15px;
+  border-radius: 20px;
+  background: rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-size: 14px;
+}
+
+#cityInput::placeholder {
+  color: rgba(255, 255, 255, 0.7);
+}
+
+#searchBtn {
+  border: none;
+  background: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  padding: 0 10px;
+}
+
+/* --- Kết quả thời tiết --- */
+#weatherResult {
+  text-align: center;
+}
+
+.current-weather h2 {
+  font-size: 24px;
+  margin: 0;
+  font-weight: 500;
+}
+
+.current-weather .icon {
+  font-size: 70px;
+  margin: 15px 0;
+}
+
+.current-weather .temp {
+  font-size: 45px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.current-weather .description {
+  font-size: 18px;
+  text-transform: capitalize;
+  margin-top: 5px;
+}
+
+.details {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+  background: rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 12px;
+}
+
+.details > div {
+  text-align: center;
+}
+
+.details p {
+  margin: 0;
+  font-size: 14px;
+}
+
+.details .value {
+  font-weight: bold;
+}
+
+/* --- Dự báo ngày tới --- */
+.forecast {
+  margin-top: 25px;
+  border-top: 1px solid rgba(255, 255, 255, 0.3);
+  padding-top: 15px;
+}
+
+.forecast h4 {
+  text-align: center;
+  margin: 0 0 10px 0;
+  font-weight: 500;
+}
+
+.forecast-days {
+  display: flex;
+  justify-content: space-between;
+}
+
+.day {
+  flex-basis: 30%;
+  text-align: center;
+  padding: 10px 5px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+}
+
+.day p {
+  margin: 4px 0;
+}
+
+.day .date {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.day .icon {
+  font-size: 24px;
+  margin: 5px 0;
+}
+
+.day .temp {
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* --- Thông báo --- */
+.message {
+  text-align: center;
+  padding: 40px 0;
+  font-size: 16px;
+}
