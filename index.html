@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <!-- Metadata cho trang web -->
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" href="./assets/image/logo.png" type="image/png">
+  <title>Tài Nguyên Media - Giao Diện Yêu Nước</title>
+  
+  <!-- Liên kết các file CSS bên ngoài -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  
+  <!-- Google Fonts: Be Vietnam Pro -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.4/dist/aos.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <!-- Bắt đầu phần Navbar (thanh điều hướng) -->
+  <nav class="navbar navbar-expand-lg navbar-dark shadow-sm sticky-top">
+    <div class="container">
+      <a class="navbar-brand d-flex align-items-center" href="#">
+        <img src="./assets/image/logo.png" alt="Logo" class="me-2" />
+        <strong>Tài Nguyên Media</strong>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link active" href="#" data-category="all">Trang chủ</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" data-category="tool">Công Cụ</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" data-category="photoshop">Photoshop</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" data-category="filming">Dựng phim</a></li>
+          <li class="nav-item"><a class="nav-link" href="#" data-category="contact">Liên hệ</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <!-- Kết thúc phần Navbar -->
+
+  <!-- Bắt đầu phần Header với Image Slider -->
+  <div class="container mt-4">
+    <header>
+      <div id="heroCarousel" class="carousel slide" data-bs-ride="carousel">
+        <div class="carousel-indicators">
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="0" class="active" aria-current="true" aria-label="Slide 1"></button>
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="1" aria-label="Slide 2"></button>
+          <button type="button" data-bs-target="#heroCarousel" data-bs-slide-to="2" aria-label="Slide 3"></button>
+        </div>
+        <div class="carousel-inner">
+          <div class="carousel-item active">
+            <img src="./assets/image/banner/banner-1.svg" class="d-block w-100" alt="Banner mừng Quốc Khánh 2/9">
+            <div class="carousel-caption">
+              <h5>Mừng Đại Lễ Quốc Khánh 2/9</h5>
+              <p>Kính chúc quý khách một kỳ nghỉ lễ vui vẻ và ý nghĩa.</p>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <img src="./assets/image/banner/banner-2.svg" class="d-block w-100" alt="Banner Tự hào dân tộc Việt Nam">
+            <div class="carousel-caption">
+              <h5>Chào Mừng 80 Năm Ngày Độc Lập (1945 - 2025)</h5>
+              <p>Nhìn lại chặng đường lịch sử hào hùng của dân tộc.</p>
+            </div>
+          </div>
+          <div class="carousel-item">
+            <img src="./assets/image/banner/banner-1.svg" class="d-block w-100" alt="Banner ưu đãi mừng lễ">
+            <div class="carousel-caption">
+              <h5>Kho Tàng Tài Nguyên</h5>
+              <p>Khám phá các preset, font chữ .</p>
+            </div>
+          </div>
+        </div>
+        <button class="carousel-control-prev" type="button" data-bs-target="#heroCarousel" data-bs-slide="prev">
+          <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Previous</span>
+        </button>
+        <button class="carousel-control-next" type="button" data-bs-target="#heroCarousel" data-bs-slide="next">
+          <span class="carousel-control-next-icon" aria-hidden="true"></span>
+          <span class="visually-hidden">Next</span>
+        </button>
+      </div>
+    </header>
+  </div>
+  <!-- Kết thúc phần Header với Image Slider -->
+  
+  <!-- Bắt đầu phần tìm kiếm -->
+  <section class="search-section my-5">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-lg-7">
+          <div class="search-box">
+            <i class="fas fa-search search-icon"></i>
+            <input type="text" id="searchInput" class="form-control" placeholder="Tìm kiếm tài nguyên, công cụ...">
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+  <!-- Kết thúc phần tìm kiếm -->
+
+  <!-- Bắt đầu phần Resource Grid -->
+  <main class="container pb-5">
+    <div class="row g-4" id="resource-list">
+      
+      <!-- Card 1: Công Cụ Tạo Mã QR -->
+      <div class="col-lg-4 col-md-6 resource-item" data-title="tao ma qr" data-category="tool">
+        <div class="card h-100" data-aos="fade-up">
+          <div class="card-img-container">
+            <img src="./assets/image/thumnail/qr-code.png" class="card-img-top" alt="QR Code Tool">
+          </div>
+          <div class="card-body">
+            <span class="card-category">Công cụ</span>
+            <h5 class="card-title mt-2">Công Cụ Tạo Mã QR</h5>
+            <p class="card-text">Công cụ tạo mã QR từ liên kết của bạn.</p>
+          </div>
+          <div class="card-footer">
+            <a href="./assets/tinh-nang/tao-ma-qr/tao-ma-qr.html" class="btn btn-primary w-100">Truy cập <i class="fas fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2: Công Cụ Tải Nhạc YouTube -->
+      <div class="col-lg-4 col-md-6 resource-item" data-title="tai nhac youtube" data-category="tool">
+        <div class="card h-100" data-aos="fade-up">
+          <div class="card-img-container">
+            <img src="./assets/image/thumnail/tai-nhac-tu-youtube-01.png" class="card-img-top" alt="Tải nhạc từ Youtube">
+          </div>
+          <div class="card-body">
+            <span class="card-category">Công cụ</span>
+            <h5 class="card-title mt-2">Công Cụ Tải Nhạc YouTube</h5>
+            <p class="card-text">Công cụ giúp bạn có thể tải nhạc từ YouTube.</p>
+          </div>
+          <div class="card-footer">
+            <a href="./assets/tinh-nang/tai-nhac-youtube/tai-nhac-youtube.html" class="btn btn-primary w-100">Truy cập <i class="fas fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3: Photoshop Online -->
+      <div class="col-lg-4 col-md-6 resource-item" data-title="photoshop online" data-category="tool">
+        <div class="card h-100" data-aos="fade-up">
+          <div class="card-img-container">
+            <img src="./assets/image/thumnail/photopea.png" class="card-img-top" alt="Photoshop Online">
+          </div>
+          <div class="card-body">
+            <span class="card-category">Công cụ</span>
+            <h5 class="card-title mt-2">Photoshop Online</h5>
+            <p class="card-text">Photoshop online ngay trên trình duyệt của bạn.</p>
+          </div>
+          <div class="card-footer">
+            <a href="./assets/tinh-nang/photopea/photopea.html" class="btn btn-primary w-100">Truy cập <i class="fas fa-arrow-right ms-2"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4: LUTs Autumn -->
+      <div class="col-lg-4 col-md-6 resource-item" data-title="luts autumn pack" data-category="filming">
+        <div class="card h-100" data-aos="fade-up">
+          <div class="card-img-container">
+            <img src="./assets/image/thumnail/Autumn-LUT Pack-Color-Finale.png" class="card-img-top" alt="Autumn LUT Pack_Color Finale">
+          </div>
+          <div class="card-body">
+            <span class="card-category">Dựng phim</span>
+            <h5 class="card-title mt-2">LUTs Autumn LUT Pack_Color Finale</h5>
+            <p class="card-text">LUTs này nên dùng Davinci Resolve sẽ tối ưu nhất.</p>
+          </div>
+          <div class="card-footer">
+            <a href="https://drive.google.com/drive/folders/166fczKk6O-UB760OXtmcQMP1u3JvVaHQ?usp=sharing" class="btn btn-primary w-100">Tải xuống <i class="fas fa-download ms-2"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 5: Film Impact 2025 -->
+      <div class="col-lg-4 col-md-6 resource-item" data-title="film impact" data-category="filming">
+        <div class="card h-100" data-aos="fade-up">
+          <div class="card-img-container">
+            <img src="./assets/image/thumnail/film-impact.png" class="card-img-top" alt="Film Impact">
+          </div>
+          <div class="card-body">
+            <span class="card-category">Dựng phim</span>
+            <h5 class="card-title mt-2">Film Impact 2025</h5>
+            <p class="card-text">Plugin hiệu ứng chuyển cảnh cho Premiere Pro. Pass: 123.</p>
+          </div>
+          <div class="card-footer">
+            <a href="https://drive.google.com/file/d/1-kpO4l7jRHRmYYMhjnTK0LZxTKrqCmWG/view" class="btn btn-primary w-100">Tải xuống <i class="fas fa-download ms-2"></i></a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 6: Davinci Resolve Studio 19.1 -->
+      <div class="col-lg-4 col-md-6 resource-item" data-title="davinci resolve studio" data-category="filming">
+        <div class="card h-100" data-aos="fade-up">
+          <div class="card-img-container">
+            <img src="./assets/image/thumnail/davinci.png" class="card-img-top" alt="Davinci Resolve Studio">
+          </div>
+          <div class="card-body">
+            <span class="card-category">Dựng phim</span>
+            <h5 class="card-title mt-2">Davinci Resolve Studio 19.1 (Win)</h5>
+            <p class="card-text">Phần mềm dựng phim chuyên nghiệp cho Windows.</p>
+          </div>
+          <div class="card-footer">
+            <a href="https://drive.google.com/drive/folders/19qMHLcZ7OM41PTSWKzkAcvqkyA1XG9B5" class="btn btn-primary w-100">Tải xuống <i class="fas fa-download ms-2"></i></a>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+  <!-- Kết thúc phần Resource Grid -->
+
+  <!-- Bắt đầu phần Footer -->
+  <footer class="footer mt-5">
+    <div class="container">
+      <div class="row gy-4">
+        <div class="col-lg-4 col-md-12">
+          <h5 class="footer-heading">Về Tài Nguyên Media</h5>
+          <p class="footer-text">Nơi chia sẻ các tài nguyên, công cụ và kiến thức về thiết kế, nhiếp ảnh và dựng phim, giúp cộng đồng sáng tạo Việt Nam phát triển.</p>
+          <div class="d-flex align-items-center mt-3">
+            <img src="./assets/image/avatar.jpg" alt="HipMedia Avatar" class="footer-avatar">
+            <div class="ms-3">
+              <h6 class="mb-0">Sáng lập bởi HIP MEDIA</h6>
+              <p class="small text-white-50 mb-0">Vì một cộng đồng sáng tạo Việt.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-2 col-6">
+          <h5 class="footer-heading">Danh mục</h5>
+          <ul class="list-unstyled footer-links">
+            <li><a href="#">Công Cụ</a></li>
+            <li><a href="#">Photoshop</a></li>
+            <li><a href="#">Dựng phim</a></li>
+            <li><a href="#">Tài liệu</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-6">
+          <h5 class="footer-heading">Thông tin</h5>
+          <ul class="list-unstyled footer-links">
+            <li><a href="#">Giới thiệu</a></li>
+            <li><a href="#">Điều khoản sử dụng</a></li>
+            <li><a href="#">Chính sách bảo mật</a></li>
+          </ul>
+        </div>
+        <div class="col-lg-3 col-md-12">
+          <h5 class="footer-heading">Kết nối với chúng tôi</h5>
+          <p class="footer-text">Theo dõi chúng tôi trên các mạng xã hội để không bỏ lỡ tài nguyên mới.</p>
+          <div class="social-icons mt-3">
+            <a href="https://www.facebook.com/hipmediatq/" class="social-icon"><i class="fab fa-facebook-f"></i></a>
+            <a href="https://zalo.me/0775755698" class="social-icon"><i class="fa-solid fa-phone"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-tiktok"></i></a>
+            <a href="#" class="social-icon"><i class="fab fa-youtube"></i></a>
+          </div>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <p>&copy; 2025 - Tài Nguyên Media. Một sản phẩm của HIP MEDIA.</p>
+      </div>
+    </div>
+  </footer>
+  <!-- Kết thúc phần Footer -->
+
+  <!-- Bắt đầu phần Modal Pop-up -->
+  <div id="customModal" class="modal-overlay">
+    <div class="modal-content-box">
+      <div class="modal-header-box">
+        <h5 class="modal-title-box" id="modalTitle">Thông báo</h5>
+        <!-- Nút X đã được xóa ở đây -->
+      </div>
+      <div class="modal-body-box">
+        <p id="modalMessage">Chào mừng bạn!</p>
+      </div>
+      <div class="modal-footer-box">
+        <button type="button" class="btn btn-primary" id="confirmModalButton">Tôi đã hiểu</button>
+      </div>
+    </div>
+  </div>
+  <!-- Kết thúc phần Modal Pop-up -->
+
+  <!-- Liên kết các file JavaScript bên ngoài -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.4/dist/aos.js"></script>
+  <script src="script.js"></script>
+</body>
+</html>

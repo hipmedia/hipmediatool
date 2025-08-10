@@ -1,0 +1,343 @@
+/*
+  STYLE.CSS - GIAO DIỆN YÊU NƯỚC
+  Thiết kế lại bởi Gemini
+*/
+
+/* --- BIẾN TOÀN CỤC VÀ CÀI ĐẶT CƠ BẢN --- */
+:root {
+  --primary-color: #DA251D; /* Màu đỏ cờ */
+  --secondary-color: #FFD700; /* Màu vàng sao */
+  --dark-color: #2C3E50; /* Màu chữ chính */
+  --light-color: #FFFFFF;
+  --gray-color: #F5F7FA;
+  --border-color: #EAECEF;
+  --body-font: 'Be Vietnam Pro', sans-serif;
+  --border-radius: 0.75rem; /* Bo góc đồng bộ */
+  --shadow: 0 4px 6px rgba(0,0,0,0.05), 0 1px 3px rgba(0,0,0,0.1);
+  --shadow-lg: 0 10px 15px rgba(0,0,0,0.05), 0 4px 6px rgba(0,0,0,0.1);
+}
+
+body {
+  font-family: var(--body-font);
+  background-color: var(--gray-color);
+  color: var(--dark-color);
+  line-height: 1.6;
+  /* Họa tiết trống đồng tinh tế làm nền */
+  background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23e0e0e0' fill-opacity='0.4'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* --- THANH ĐIỀU HƯỚNG (NAVBAR) --- */
+.navbar {
+  background-color: var(--primary-color);
+  transition: background-color 0.3s ease;
+}
+
+.navbar-brand img {
+  height: 40px;
+}
+
+.navbar-brand strong {
+  font-weight: 700;
+}
+
+.navbar .nav-link {
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.85);
+  padding: 0.5rem 1rem;
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+}
+
+.navbar .nav-link:hover,
+.navbar .nav-link.active {
+  color: var(--light-color);
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+/* --- SLIDER (CAROUSEL) --- */
+#heroCarousel {
+  border-radius: var(--border-radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+}
+
+#heroCarousel .carousel-item {
+  height: 50vh;
+  min-height: 400px;
+}
+
+#heroCarousel .carousel-item img {
+  height: 100%;
+  object-fit: cover;
+}
+
+#heroCarousel .carousel-caption {
+  text-align: left;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 2rem 3rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 100%);
+}
+
+#heroCarousel .carousel-caption h5 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+#heroCarousel .carousel-caption p {
+  color: var(--light-color);
+  font-size: 1.1rem;
+}
+
+/* --- KHUNG TÌM KIẾM --- */
+.search-box {
+  position: relative;
+}
+
+.search-box .form-control {
+  height: 3.5rem;
+  border-radius: 50px;
+  padding-left: 3.5rem;
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow);
+  transition: all 0.3s ease;
+}
+
+.search-box .form-control:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(218, 37, 29, 0.2);
+}
+
+.search-box .search-icon {
+  position: absolute;
+  left: 1.25rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #999;
+}
+
+/* --- CARD TÀI NGUYÊN --- */
+.card {
+  border: none;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: var(--light-color);
+  display: flex;
+  flex-direction: column;
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: var(--shadow-lg);
+}
+
+.card .card-img-container {
+  overflow: hidden;
+  border-top-left-radius: var(--border-radius);
+  border-top-right-radius: var(--border-radius);
+}
+
+.card .card-img-top {
+  height: 200px;
+  object-fit: cover;
+  transition: transform 0.4s ease;
+}
+
+.card:hover .card-img-top {
+  transform: scale(1.05);
+}
+
+.card-body {
+  padding: 1.5rem;
+  flex-grow: 1;
+}
+
+.card-category {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.card-title {
+  font-weight: 700;
+  color: var(--dark-color);
+  font-size: 1.25rem;
+}
+
+.card-text {
+  color: #555;
+  font-size: 0.95rem;
+}
+
+.card-footer {
+  background-color: transparent;
+  border-top: 1px solid var(--border-color);
+  padding: 1rem 1.5rem;
+}
+
+/* --- NÚT BẤM --- */
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  font-weight: 500;
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--border-radius);
+  transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+  background-color: #B81D17;
+  border-color: #B81D17;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(218, 37, 29, 0.3);
+}
+
+/* --- CHÂN TRANG (FOOTER) --- */
+.footer {
+  background-color: #263238; /* Màu nền tối, sang trọng */
+  color: rgba(255, 255, 255, 0.7);
+  padding: 4rem 0 0;
+}
+
+.footer-heading {
+  font-weight: 700;
+  color: var(--light-color);
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.footer-text {
+  font-size: 0.95rem;
+}
+
+.footer-avatar {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 50%;
+}
+
+.footer-links li {
+  margin-bottom: 0.75rem;
+}
+
+.footer-links a {
+  color: rgba(255, 255, 255, 0.7);
+  text-decoration: none;
+  transition: all 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: var(--light-color);
+  padding-left: 5px;
+}
+
+.social-icons .social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: var(--light-color);
+  text-decoration: none;
+  margin-right: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.social-icons .social-icon:hover {
+  background-color: var(--primary-color);
+  transform: translateY(-3px);
+}
+
+.footer-bottom {
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  text-align: center;
+  padding: 1.5rem 0;
+  margin-top: 3rem;
+}
+
+.footer-bottom p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* --- MODAL POP-UP --- */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  z-index: 1050;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content-box {
+  background: var(--light-color);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-lg);
+  width: 90%;
+  max-width: 500px;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.modal-header-box {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  text-align: center; /* Căn giữa tiêu đề */
+}
+
+.modal-title-box {
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.modal-body-box {
+  padding: 1.5rem;
+}
+
+.modal-footer-box {
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--border-color);
+  text-align: right;
+}
+
+/* --- TỐI ƯU CHO THIẾT BỊ DI ĐỘNG (RESPONSIVE) --- */
+@media (max-width: 991.98px) {
+  #heroCarousel .carousel-caption h5 {
+    font-size: 2rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  #heroCarousel .carousel-item {
+    height: 40vh;
+    min-height: 300px;
+  }
+  #heroCarousel .carousel-caption {
+    padding: 1.5rem;
+  }
+  #heroCarousel .carousel-caption h5 {
+    font-size: 1.5rem;
+  }
+  .footer {
+    text-align: center;
+  }
+  .footer .d-flex {
+    justify-content: center;
+  }
+  .social-icons {
+    justify-content: center;
+  }
+}
