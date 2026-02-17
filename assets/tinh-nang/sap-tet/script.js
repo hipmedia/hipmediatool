@@ -16,7 +16,7 @@
 
 
     const countdown = () => {
-      const newYear = new Date("2026-02-17T00:00:00").getTime();
+      const newYear = new Date("2027-02-06T00:00:00").getTime();
       const now = new Date().getTime();
       const distance = newYear - now;
 
@@ -42,4 +42,5 @@
     };
 
     setInterval(countdown, 1000);
+
     countdown();
