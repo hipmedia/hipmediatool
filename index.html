@@ -1,0 +1,346 @@
+
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sắp Ra Mắt | Hệ Thống Đang Nâng Cấp</title>
+    <!-- Đổi sang font VT323 hỗ trợ tiếng Việt tốt cho phong cách Terminal/Retro -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --neon-green: #39ff14;
+            --dark-bg: #050505;
+            --pixel-border: 4px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body, html {
+            height: 100%;
+            width: 100%;
+            background-color: var(--dark-bg);
+            color: var(--neon-green);
+            font-family: 'VT323', monospace; /* Sử dụng font mới */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Hiệu ứng màn hình CRT (Scanlines) */
+        body::before {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
+        }
+
+        /* Lưới nền (Grid) */
+        .background-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(57, 255, 20, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(57, 255, 20, 0.1) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            animation: moveGrid 20s linear infinite;
+        }
+
+        @keyframes moveGrid {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(40px); }
+        }
+
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 2.5rem;
+            max-width: 800px;
+            width: 90%;
+            background: rgba(0, 0, 0, 0.85);
+            border: var(--pixel-border) solid var(--neon-green);
+            box-shadow: 
+                8px 8px 0 rgba(57, 255, 20, 0.3),
+                inset 4px 4px 0 rgba(57, 255, 20, 0.2);
+        }
+
+        h1 {
+            font-size: 3.5rem; /* Tăng size vì font VT323 mỏng hơn */
+            line-height: 1.2;
+            margin-bottom: 1rem;
+            text-shadow: 3px 3px 0px #005500;
+            word-wrap: break-word;
+            text-transform: uppercase;
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 20px;
+            height: 35px;
+            background-color: var(--neon-green);
+            vertical-align: text-bottom;
+            animation: blink 1s step-end infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        p.subtitle {
+            font-size: 1.5rem;
+            line-height: 1.5;
+            margin-bottom: 2.5rem;
+            color: #ddd;
+        }
+
+        .countdown {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .time-box {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .time-value {
+            font-size: 4.5rem;
+            margin-bottom: 0.2rem;
+            text-shadow: 4px 4px 0 #005500;
+            line-height: 1;
+        }
+
+        .time-label {
+            font-size: 1.2rem;
+            color: #aaa;
+            text-transform: uppercase;
+        }
+
+        .subscribe-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        @media (min-width: 600px) {
+            .subscribe-form {
+                flex-direction: row;
+                justify-content: center;
+            }
+        }
+
+        input[type="email"] {
+            font-family: 'VT323', monospace;
+            background: #000;
+            color: var(--neon-green);
+            border: 2px solid var(--neon-green);
+            padding: 10px 15px;
+            font-size: 1.3rem;
+            width: 100%;
+            max-width: 320px;
+            outline: none;
+        }
+
+        input[type="email"]::placeholder {
+            color: #005500;
+        }
+
+        input[type="email"]:focus {
+            background: #111;
+            box-shadow: 0 0 10px rgba(57, 255, 20, 0.5);
+        }
+
+        button {
+            font-family: 'VT323', monospace;
+            background: var(--neon-green);
+            color: #000;
+            border: 2px solid var(--neon-green);
+            padding: 10px 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.1s;
+            text-transform: uppercase;
+            box-shadow: 4px 4px 0 #005500;
+        }
+
+        button:hover {
+            background: #4dff2a;
+        }
+
+        button:active {
+            transform: translate(4px, 4px);
+            box-shadow: 0 0 0 #005500;
+        }
+
+        /* Hộp thoại thông báo */
+        #message-box {
+            margin-top: 1.5rem;
+            font-size: 1.2rem;
+            padding: 10px;
+            border: 2px dashed var(--neon-green);
+            display: none;
+        }
+
+        #message-box.success {
+            display: block;
+            background: rgba(57, 255, 20, 0.1);
+        }
+
+        #message-box.error {
+            display: block;
+            border-color: #ff3333;
+            color: #ff3333;
+            background: rgba(255, 51, 51, 0.1);
+        }
+
+        .system-status {
+            position: absolute;
+            bottom: 10px;
+            right: 15px;
+            font-size: 1.2rem;
+            color: #005500;
+            z-index: 10;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2.2rem; }
+            .time-value { font-size: 3rem; }
+            .container { padding: 1.5rem; }
+            .countdown { gap: 1rem; }
+            p.subtitle { font-size: 1.2rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="background-grid"></div>
+
+    <div class="container">
+        <h1>SẮP RA MẮT<span class="cursor"></span></h1>
+        <p class="subtitle">> HỆ THỐNG ĐANG ĐƯỢC THIẾT LẬP VÀ NÂNG CẤP. VUI LÒNG CHỜ ĐỢI...</p>
+
+        <div class="countdown" id="countdown">
+            <div class="time-box">
+                <div class="time-value" id="days">00</div>
+                <div class="time-label">Ngày</div>
+            </div>
+            <div class="time-box">
+                <div class="time-value" id="hours">00</div>
+                <div class="time-label">Giờ</div>
+            </div>
+            <div class="time-box">
+                <div class="time-value" id="minutes">00</div>
+                <div class="time-label">Phút</div>
+            </div>
+            <div class="time-box">
+                <div class="time-value" id="seconds">00</div>
+                <div class="time-label">Giây</div>
+            </div>
+        </div>
+
+        <div class="subscribe-form">
+            <input type="email" id="email-input" placeholder="NHẬP_EMAIL_CỦA_BẠN...">
+            <button onclick="handleSubscribe()">GHI NHẬN</button>
+        </div>
+
+        <div id="message-box"></div>
+    </div>
+
+    <div class="system-status">SYS.STATUS: ONLINE | V.1.0.42</div>
+
+    <script>
+        // --- Thiết lập bộ đếm ngược (Countdown) ---
+        // Cài đặt ngày ra mắt là 14 ngày kể từ thời điểm hiện tại
+        const targetDate = new Date().getTime() + (14 * 24 * 60 * 60 * 1000);
+
+        const updateCountdown = () => {
+            const now = new Date().getTime();
+            const distance = targetDate - now;
+
+            if (distance < 0) {
+                clearInterval(timerInterval);
+                document.getElementById("countdown").innerHTML = "<div class='time-value'>HỆ THỐNG ĐÃ SẴN SÀNG!</div>";
+                return;
+            }
+
+            // Tính toán thời gian
+            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+            // Cập nhật DOM, thêm số 0 ở trước nếu nhỏ hơn 10
+            document.getElementById("days").innerText = days.toString().padStart(2, '0');
+            document.getElementById("hours").innerText = hours.toString().padStart(2, '0');
+            document.getElementById("minutes").innerText = minutes.toString().padStart(2, '0');
+            document.getElementById("seconds").innerText = seconds.toString().padStart(2, '0');
+        };
+
+        // Cập nhật mỗi giây
+        updateCountdown();
+        const timerInterval = setInterval(updateCountdown, 1000);
+
+        // --- Xử lý đăng ký Email ---
+        function handleSubscribe() {
+            const emailInput = document.getElementById('email-input');
+            const messageBox = document.getElementById('message-box');
+            const email = emailInput.value.trim();
+
+            // Kiểm tra định dạng email cơ bản
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (email === "") {
+                messageBox.className = "error";
+                messageBox.innerText = "> LỖI: VUI LÒNG NHẬP EMAIL!";
+            } else if (!emailRegex.test(email)) {
+                messageBox.className = "error";
+                messageBox.innerText = "> LỖI: ĐỊNH DẠNG EMAIL KHÔNG HỢP LỆ!";
+            } else {
+                // Mô phỏng gửi thành công
+                messageBox.className = "success";
+                messageBox.innerText = "> THÀNH CÔNG! ĐÃ GHI NHẬN EMAIL: " + email;
+                emailInput.value = ""; // Xóa input
+                
+                // Ẩn thông báo sau 4 giây
+                setTimeout(() => {
+                    messageBox.className = "";
+                }, 4000);
+            }
+        }
+
+        // Hỗ trợ nhấn Enter để đăng ký
+        document.getElementById('email-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                handleSubscribe();
+            }
+        });
+    </script>
+</body>
+</html>
+
+
+
