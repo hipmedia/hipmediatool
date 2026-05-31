@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CiCi Media | Workspace</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* CSS bổ sung cho khu vực Phím tắt nhanh */
+        .shortcuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2.5rem;
+        }
+        .shortcut-btn {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            color: var(--text-primary);
+            transition: var(--transition);
+            box-shadow: var(--shadow);
+        }
+        .shortcut-btn i {
+            font-size: 2rem;
+            color: var(--accent);
+        }
+        .shortcut-btn:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            color: var(--accent);
+            background: var(--accent-light);
+        }
+        .shortcut-btn span {
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <header class="mobile-header">
+            <div class="mobile-brand"><i class="ph-fill ph-aperture"></i> Cici Media</div>
+            <i class="ph ph-list menu-toggle" id="mobile-menu-btn"></i>
+        </header>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <img src="https://placehold.co/150x150/0ea5e9/ffffff?text=CICIMEDIA" alt="Logo" class="brand-logo">
+                <div class="brand-text">
+                    <span class="brand-name">Cici Media</span>
+                    <span class="brand-sub">Workspace</span>
+                </div>
+            </div>
+            <nav class="menu">
+                <div class="menu-label">MENU CHÍNH</div>
+                <a href="index.html" class="menu-item active"><i class="ph ph-squares-four"></i> Tổng quan</a>
+                <a href="watermark.html" class="menu-item"><i class="ph ph-image"></i> Chèn Watermark</a>
+                <a href="qr-generator.html" class="menu-item"><i class="ph ph-qr-code"></i> Mã QR Tool</a>
+                <a href="typing-test.html" class="menu-item"><i class="ph ph-keyboard"></i> Typing Test</a>
+                <a href="lucky-draw.html" class="menu-item"><i class="ph ph-gift"></i> Vòng Quay & Bốc Thăm</a>
+                <a href="photo-editor.html" class="menu-item"><i class="ph ph-aperture"></i> Photo Editor</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="menu-item" id="theme-toggle"><i class="ph ph-moon"></i> Đổi Giao Diện</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar">
+                <div>
+                    <h1 class="page-title">Tổng quan</h1>
+                    <p class="page-subtitle" id="greeting-text">Chào mừng trở lại trạm làm việc của CiCi Media.</p>
+                </div>
+                <div class="time-widget">
+                    <i class="ph ph-clock"></i> <span id="live-clock">00:00:00</span>
+                </div>
+            </header>
+            
+            <div class="menu-label" style="margin-bottom: 1rem; color: var(--accent);">TRUY CẬP NHANH</div>
+            <div class="shortcuts-grid">
+                <a href="https://drive.google.com" target="_blank" class="shortcut-btn">
+                    <i class="ph-fill ph-google-drive-logo" style="color: #10b981;"></i>
+                    <span>Google Drive</span>
+                </a>
+                <a href="https://www.canva.com/" target="_blank" class="shortcut-btn">
+                    <i class="ph-fill ph-paint-brush-broad" style="color: #8b5cf6;"></i>
+                    <span>Canva</span>
+                </a>
+                <a href="https://creativecloud.adobe.com/" target="_blank" class="shortcut-btn">
+                    <i class="ph-fill ph-bezier-curve" style="color: #ef4444;"></i>
+                    <span>Adobe Cloud</span>
+                </a>
+                <a href="https://artlist.io/" target="_blank" class="shortcut-btn">
+                    <i class="ph-fill ph-music-notes" style="color: #f59e0b;"></i>
+                    <span>Artlist</span>
+                </a>
+                <a href="https://www.epidemicsound.com/" target="_blank" class="shortcut-btn">
+                    <i class="ph-fill ph-waveform" style="color: #ec4899;"></i>
+                    <span>Epidemic Sound</span>
+                </a>
+            </div>
+
+            <div class="menu-label" style="margin-bottom: 1rem;">CÔNG CỤ NỘI BỘ</div>
+            <div class="tools-grid">
+                <a href="watermark.html" class="tool-card">
+                    <div class="card-icon"><i class="ph ph-qr-code"></i></div>
+                    <div class="card-info">
+                        <h3>Chèn watermark</h3><p>Chèn và chỉnh sửa watermark dễ dàng</p>
+                    </div>
+                </a>
+                <a href="qr-generator.html" class="tool-card">
+                    <div class="card-icon"><i class="ph ph-qr-code"></i></div>
+                    <div class="card-info">
+                        <h3>Mã QR Tool</h3><p>Tạo và quét mã QR đa năng.</p>
+                    </div>
+                </a>
+                <a href="typing-test.html" class="tool-card">
+                    <div class="card-icon"><i class="ph ph-keyboard"></i></div>
+                    <div class="card-info">
+                        <h3>Typing Test</h3><p>Kiểm tra tốc độ gõ (WPM) chuẩn xác.</p>
+                    </div>
+                </a>
+                <a href="lucky-draw.html" class="tool-card">
+                    <div class="card-icon"><i class="ph ph-gift"></i></div>
+                    <div class="card-info">
+                        <h3>Bốc Thăm Hộp Quà</h3><p>Hệ thống vòng quay và hộp quà ngẫu nhiên.</p>
+                    </div>
+                </a>
+                <a href="photo-editor.html" class="tool-card">
+                    <div class="card-icon"><i class="ph ph-aperture"></i></div>
+                    <div class="card-info">
+                        <h3>Photo Editor</h3><p>Chỉnh sửa đồ họa với Photopea.</p>
+                    </div>
+                </a>
+            </div>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
