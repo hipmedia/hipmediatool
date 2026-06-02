@@ -71,7 +71,6 @@
         .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
         .btn-outline.active { background: var(--accent); color: white; border-color: var(--accent); }
 
-        /* Danh sách Layer */
         #layer-list {
             border: 1px solid var(--border-color); border-radius: 8px;
             max-height: 160px; overflow-y: auto; background: var(--bg-body);
@@ -87,7 +86,6 @@
         .del-btn { background: none; border: none; color: #ef4444; cursor: pointer; font-size: 1rem; opacity: 0.6; transition: 0.2s; }
         .del-btn:hover { opacity: 1; transform: scale(1.1); }
 
-        /* Hình thu nhỏ dưới đáy */
         .thumbnail-gallery { width: 100%; display: flex; gap: 0.8rem; overflow-x: auto; margin-top: 1.5rem; padding: 5px 5px 15px 5px; align-items: center; }
         .thumbnail-gallery::-webkit-scrollbar { height: 6px; }
         .thumbnail-gallery::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; }
@@ -99,7 +97,6 @@
         .thumb-del-btn { position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; background: #ef4444; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; font-weight: bold; z-index: 5; }
         .thumb-wrapper:hover .thumb-del-btn { display: flex; }
         
-        /* Ẩn scrollbar panel trái */
         .controls-panel::-webkit-scrollbar { width: 4px; }
         .controls-panel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
     </style>
@@ -133,7 +130,7 @@
         <main class="main-content">
             <header class="topbar" style="margin-bottom: 1.5rem;">
                 <div>
-                    <h1 class="page-title">DSLRBooth Frame Pro</h1>
+                    <h1 class="page-title">DSLRBooth Frame </h1>
                     <p class="page-subtitle">Hệ thống AI nhận diện lỗ nghiêng siêu chuẩn & Quản lý Layout kéo thả.</p>
                 </div>
             </header>
@@ -184,7 +181,7 @@
                         
                         <p style="margin-top: 0.8rem; font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5; background: var(--bg-body); padding: 0.8rem; border-radius: 8px; border-left: 4px solid #eab308;">
                             <i class="ph-fill ph-warning-circle" style="color: #eab308; font-size: 1.1rem; vertical-align: bottom;"></i> 
-                            <b>Lưu ý:</b> Vui lòng tải ảnh lên để bắt đầu. Ảnh của bạn đóng vai trò là khung nền background. Để ảnh in sắc nét, hãy ưu tiên các ảnh có kích thước thiết kế tiêu chuẩn <b>1800x1200</b> hoặc <b>2400x3600</b>.
+                            <b>Lưu ý:</b> Ảnh của bạn đóng vai trò là khung nền background. Để ảnh in sắc nét, hãy ưu tiên các ảnh có kích thước thiết kế tiêu chuẩn <b>1800x1200</b> hoặc <b>2400x3600</b>.
                         </p>
                     </div>
                     
@@ -201,8 +198,8 @@
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                             <label style="margin:0;"><i class="ph-bold ph-layers"></i> 3. Quản lý Layer</label>
                             <div style="display: flex; gap: 0.5rem;">
-                                <button onclick="addTextLayer()" class="btn-outline" style="padding: 0.3rem 0.6rem;"><i class="ph-bold ph-text-t"></i> + Thêm Layer Chữ</button>
-                                <button onclick="addManualSlot()" class="btn-outline" style="padding: 0.3rem 0.6rem;"><i class="ph-bold ph-bounding-box"></i> + Thêm Lỗ Đục</button>
+                                <button onclick="addTextLayer()" class="btn-outline" style="padding: 0.3rem 0.6rem;"><i class="ph-bold ph-text-t"></i> + Chữ</button>
+                                <button onclick="addManualSlot()" class="btn-outline" style="padding: 0.3rem 0.6rem;"><i class="ph-bold ph-bounding-box"></i> + Lỗ</button>
                             </div>
                         </div>
                         <div id="layer-list">
@@ -252,8 +249,7 @@
         let framesData = []; 
         let currentIndex = 0;
 
-        // BIẾN TRANSFORM CHUỘT
-        let appMode = 'select'; // 'select' hoặc 'draw'
+        let appMode = 'select';
         let activeObj = { type: null, id: null }; 
         let isDragging = false;
         let dragAction = null; 
@@ -261,22 +257,14 @@
         let dragStartObj = null; 
         let currentTempSlot = null;
 
-        // KÉO THẢ UPLOAD
         const uploadBox = document.getElementById('drop-zone');
         const fileInput = document.getElementById('bg-upload');
 
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            uploadBox.addEventListener(eventName, preventDefaults, false);
-        });
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => { uploadBox.addEventListener(eventName, preventDefaults, false); });
         function preventDefaults(e) { e.preventDefault(); e.stopPropagation(); }
 
-        ['dragenter', 'dragover'].forEach(eventName => {
-            uploadBox.addEventListener(eventName, () => uploadBox.classList.add('drag-over'), false);
-        });
-
-        ['dragleave', 'drop'].forEach(eventName => {
-            uploadBox.addEventListener(eventName, () => uploadBox.classList.remove('drag-over'), false);
-        });
+        ['dragenter', 'dragover'].forEach(eventName => { uploadBox.addEventListener(eventName, () => uploadBox.classList.add('drag-over'), false); });
+        ['dragleave', 'drop'].forEach(eventName => { uploadBox.addEventListener(eventName, () => uploadBox.classList.remove('drag-over'), false); });
 
         uploadBox.addEventListener('drop', (e) => {
             let dt = e.dataTransfer; let files = dt.files;
@@ -293,7 +281,6 @@
             }
         }
 
-        // TẢI ẢNH LÊN
         fileInput.addEventListener('change', async function(e) {
             if(e.target.files.length > 0) {
                 const newFiles = Array.from(e.target.files);
@@ -370,12 +357,10 @@
             } else { updateUI(); renderPreview(); }
         }
 
-        // ĐẢM BẢO KÍCH THƯỚC AUTO LÀ FULL QUALITY
         function changeGlobalSize() {
             const val = document.getElementById('canvas-size').value;
             if (val === 'auto') {
                 if (framesData.length > 0 && framesData[currentIndex].origImg && framesData[currentIndex].fileName !== 'blank_template.png') {
-                    // Lấy chính xác kích thước pixel thực của ảnh gốc tải lên
                     canvasW = framesData[currentIndex].origImg.naturalWidth || framesData[currentIndex].origImg.width; 
                     canvasH = framesData[currentIndex].origImg.naturalHeight || framesData[currentIndex].origImg.height;
                 } else { canvasW = 1200; canvasH = 1800; }
@@ -386,7 +371,7 @@
         }
 
         // ==========================================
-        // 2. LAYER MANAGEMENT 
+        // QUẢN LÝ LAYER & FIX LỖI MẤT FOCUS
         // ==========================================
         function addTextLayer() {
             ensureFrameExists(); const id = Date.now();
@@ -414,20 +399,29 @@
             renderLayersUI(); renderPreview();
         }
 
+        // HÀM QUAN TRỌNG: CHỈ UPDATE DATA + CANVAS, KHÔNG RE-RENDER BẢNG PROPERTY
         function updateActiveObj(prop, value) {
             if(!activeObj.type || framesData.length === 0) return;
             const frame = framesData[currentIndex];
+            
             if(activeObj.type === 'text') {
                 const txt = frame.texts.find(t => t.id === activeObj.id);
                 if(txt) {
                     if(prop === 'size' || prop === 'x' || prop === 'y') txt[prop] = parseInt(value) || 0;
                     else txt[prop] = value;
+                    
+                    // Cập nhật tên Layer mượt mà không làm văng Focus
+                    if (prop === 'text') {
+                        const titleEl = document.getElementById(`layer-title-text-${txt.id}`);
+                        if (titleEl) titleEl.innerHTML = `<i class="ph-bold ph-text-t"></i> ${txt.text.substring(0,12) || 'Chữ rỗng'}`;
+                    }
                 }
             } else if (activeObj.type === 'slot') {
                 const slot = frame.slots.find(s => s.id === activeObj.id);
                 if(slot) slot[prop] = parseInt(value) || 0;
             }
-            renderLayersUI(); renderPreview();
+            
+            renderPreview(); // Chỉ vẽ lại Canvas, người dùng gõ phím vô tư
         }
 
         function renderLayersUI() {
@@ -444,7 +438,7 @@
                 div.className = `layer-row ${activeObj.type==='text' && activeObj.id===txt.id ? 'active' : ''}`;
                 div.onclick = () => setActiveObj('text', txt.id);
                 div.innerHTML = `
-                    <div style="display:flex; align-items:center; gap:0.5rem;"><i class="ph-bold ph-text-t"></i> ${txt.text.substring(0,12) || 'Chữ rỗng'}</div>
+                    <div id="layer-title-text-${txt.id}" style="display:flex; align-items:center; gap:0.5rem;"><i class="ph-bold ph-text-t"></i> ${txt.text.substring(0,12) || 'Chữ rỗng'}</div>
                     <button class="del-btn" onclick="event.stopPropagation(); removeLayer('text', ${txt.id})"><i class="ph-bold ph-trash"></i></button>
                 `;
                 layerList.appendChild(div);
@@ -475,7 +469,9 @@
                 const txt = frame.texts.find(t => t.id === activeObj.id);
                 if (!txt) return;
                 propertiesPanel.innerHTML = `
+                    <label style="font-size:0.8rem; color:var(--text-secondary); margin-bottom:0.2rem; display:block;">Nội dung chữ:</label>
                     <input type="text" class="prop-input" style="margin-bottom:0.8rem;" value="${txt.text}" oninput="updateActiveObj('text', this.value)">
+                    
                     <div style="display: grid; grid-template-columns: 1fr 40px; gap: 0.5rem; margin-bottom: 0.8rem;">
                         <select class="prop-input" onchange="updateActiveObj('font', this.value)">
                             <option value="Montserrat" ${txt.font==='Montserrat'?'selected':''}>Hiện đại (Montserrat)</option>
@@ -485,6 +481,7 @@
                         </select>
                         <input type="color" class="prop-input" style="padding:0; height:100%; border:none;" value="${txt.color}" oninput="updateActiveObj('color', this.value)">
                     </div>
+                    
                     <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;">
                         <div><small style="color:var(--text-secondary);">Size</small><input type="number" class="prop-input" value="${txt.size}" oninput="updateActiveObj('size', this.value)"></div>
                         <div><small style="color:var(--text-secondary);">Trục X</small><input type="number" class="prop-input" id="prop-txt-x" value="${Math.round(txt.x)}" oninput="updateActiveObj('x', this.value)"></div>
@@ -509,7 +506,7 @@
         }
 
         // ==========================================
-        // 3. AI TÌM LỖ THÔNG MINH (PCA THUẬT TOÁN)
+        // PCA THUẬT TOÁN AI BẮT LỖ NGHIÊNG XÉO
         // ==========================================
         function autoDetectSlots() {
             if (framesData.length === 0 || framesData[0].fileName === 'blank_template.png') return Swal.fire('Lỗi', 'Vui lòng tải ảnh nền chứa mảng màu xanh lá để AI phân tích!', 'warning');
@@ -526,25 +523,23 @@
                 const visited = new Uint8Array(canvasW * canvasH);
                 let detectedSlots = 0;
                 
-                const STEP = 4; // Nhảy 4 pixel để thuật toán chạy mượt mà không đơ máy
+                const STEP = 4;
 
                 function isHole(x, y) {
                     if (x < 0 || x >= canvasW || y < 0 || y >= canvasH) return false;
                     const idx = (y * canvasW + x) * 4;
                     const r = data[idx], g = data[idx+1], b = data[idx+2], a = data[idx+3];
-                    // Phát hiện màu Xanh Lá cực mạnh hoặc Trong suốt hoàn toàn
                     if (a > 100 && g > 90 && g > r * 1.3 && g > b * 1.3) return true;
                     if (a < 30) return true; 
                     return false;
                 }
                 
-                const blobs = []; // Chứa các đốm lỗ đục
+                const blobs = [];
 
                 for (let y = 0; y < canvasH; y += STEP) { 
                     for (let x = 0; x < canvasW; x += STEP) {
                         const pos = y * canvasW + x;
                         if (!visited[pos] && isHole(x, y)) {
-                            // Flood Fill tìm diện tích lỗ
                             const stack = [[x, y]];
                             const currentBlob = [];
                             visited[pos] = 1;
@@ -565,7 +560,6 @@
                                     }
                                 }
                             }
-                            // Loại bỏ rác: Lỗ phải lớn hơn 0.5% diện tích khung
                             if (currentBlob.length > (canvasW * canvasH) / (STEP*STEP) * 0.005) {
                                 blobs.push(currentBlob);
                             }
@@ -573,7 +567,6 @@
                     }
                 }
                 
-                // Toán học PCA (Principal Component Analysis) để bọc khối vuông xoay nghiêng chuẩn xác
                 blobs.forEach(pixels => {
                     let sumX = 0, sumY = 0;
                     pixels.forEach(p => { sumX += p[0]; sumY += p[1]; });
@@ -586,10 +579,8 @@
                         mxx += dx * dx; myy += dy * dy; mxy += dx * dy;
                     });
 
-                    // Tính Góc xoay
                     let angle = 0.5 * Math.atan2(2 * mxy, mxx - myy); 
 
-                    // Tìm Chiều rộng và Cao chuẩn
                     let minU = Infinity, maxU = -Infinity;
                     let minV = Infinity, maxV = -Infinity;
                     const cosA = Math.cos(angle); const sinA = Math.sin(angle);
@@ -605,7 +596,6 @@
                     const h = maxV - minV + STEP;
                     let rDeg = angle * 180 / Math.PI;
 
-                    // Chuẩn hóa góc và tọa độ để xuất file chính xác
                     const slotX = cx - w / 2;
                     const slotY = cy - h / 2;
 
@@ -626,13 +616,13 @@
         }
 
         // ==========================================
-        // 4. MOUSE TRANSFORM (KÉO/RESIZE TRÊN CANVAS)
+        // MOUSE TRANSFORM (KÉO/RESIZE TRÊN CANVAS)
         // ==========================================
         function toggleMode(mode) {
             appMode = mode;
             if (mode === 'draw') {
                 document.getElementById('btn-draw-mode').classList.add('active');
-                document.getElementById('btn-draw-mode').innerHTML = '<i class="ph-bold ph-pencil-simple"></i> Vẽ Đục Lỗ (Bật)';
+                document.getElementById('btn-draw-mode').innerHTML = '<i class="ph-bold ph-pencil-simple"></i> Vẽ Lỗ (Bật)';
                 canvas.classList.add('draw-mode'); 
             } else {
                 document.getElementById('btn-draw-mode').classList.remove('active');
@@ -777,14 +767,13 @@
         canvas.addEventListener('touchmove', (e) => { if(isDrawing || isDragging) { e.preventDefault(); e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; canvas.dispatchEvent(new MouseEvent('mousemove', e)); } }, {passive: false});
         canvas.addEventListener('touchend', (e) => { canvas.dispatchEvent(new MouseEvent('mouseup', e)); });
 
-
         // ==========================================
-        // 5. RENDER CHÍNH XÁC LÊN PREVIEW
+        // RENDER PREVIEW CANVAS
         // ==========================================
         function renderPreview() {
             canvas.width = canvasW; canvas.height = canvasH;
             if(canvasW > 0 && canvasH > 0) {
-                canvasInfo.style.display = 'block'; canvasInfo.innerText = `Kích thước in: ${canvasW} x ${canvasH} px`;
+                canvasInfo.style.display = 'block'; canvasInfo.innerText = `Độ phân giải: ${canvasW} x ${canvasH} px`;
             }
 
             if (framesData.length === 0) { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvasW, canvasH); return; }
@@ -793,7 +782,6 @@
             if (currentFrame.fileName === 'blank_template.png') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvasW, canvasH); } 
             else { ctx.drawImage(currentFrame.origImg, 0, 0, canvasW, canvasH); }
 
-            // Lớp Chữ
             currentFrame.texts.forEach(txt => {
                 ctx.save();
                 ctx.fillStyle = txt.color; ctx.font = `bold ${txt.size}px "${txt.font}", sans-serif`;
@@ -808,7 +796,6 @@
                 ctx.restore();
             });
 
-            // Lớp Lỗ & Transform UI
             currentFrame.slots.forEach((slot, i) => {
                 ctx.save();
                 ctx.translate(slot.x + slot.w/2, slot.y + slot.h/2);
@@ -835,7 +822,7 @@
         }
 
         // ==========================================
-        // 6. XUẤT ẢNH & TEMPLATE
+        // XUẤT ẢNH & TEMPLATE
         // ==========================================
         function loadTemplate() {
             const val = document.getElementById('template-select').value;
@@ -881,7 +868,7 @@
 
         async function exportFrames() {
             const exportData = framesData.filter(f => f.fileName !== 'blank_template.png');
-            if (exportData.length === 0) return Swal.fire('Lỗi', 'Vui lòng tải lên khung ảnh đã design để xuất!', 'warning');
+            if (exportData.length === 0) return Swal.fire('Lỗi', 'Vui lòng tải ảnh nền lên để xuất!', 'warning');
 
             if (exportData.length === 1) {
                 const blob = await processSingleFrame(exportData[0]);
