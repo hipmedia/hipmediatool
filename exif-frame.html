@@ -3,8 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/png" href="./logos/logos.png">
-    <title>Đóng Dấu Ảnh | Cici Media</title>
+    <title>Khung Ảnh EXIF | Cici Media</title>
+    
+    <link rel="icon" type="image/png" href="logos/cicimedia.png">
+    
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
@@ -92,16 +94,17 @@
     <div class="app-layout">
         <header class="mobile-header">
             <div class="mobile-brand">
-                <img src="https://cicivn.io.vn/assets/images/branding/logo-placeholder.png" alt="Cici Media">
+                <img src="logos/cicimedia.png" alt="Cici Media">
             </div>
             <i class="ph ph-list menu-toggle" id="mobile-menu-btn"></i>
         </header>
-    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
 
         <aside class="sidebar" id="sidebar">
             <div class="brand">
-                <img src="https://cicivn.io.vn/assets/images/branding/logo-placeholder.png" alt="Cici Media Logo" class="brand-logo">
+                <img src="logos/cicimedia.png" alt="Cici Media Logo" class="brand-logo">
             </div>
+
             <nav class="menu">
                 <div class="menu-label">MENU CHÍNH</div>
                 <a href="index.html" class="menu-item"><i class="ph ph-squares-four"></i> Tổng quan</a>
@@ -120,8 +123,8 @@
         <main class="main-content">
             <header class="topbar" style="margin-bottom: 2rem;">
                 <div>
-                    <h1 class="page-title">Đóng dấu ảnh</h1>
-                    <p class="page-subtitle">Tự động chèn logo hãng máy ảnh/điện thoại thực tế.</p>
+                    <h1 class="page-title">Khung Ảnh EXIF Hãng</h1>
+                    <p class="page-subtitle">Tự động nạp logo hãng máy ảnh/điện thoại thực tế.</p>
                 </div>
             </header>
 
@@ -239,8 +242,9 @@
                         resolve();
                     };
                     img.onerror = () => {
+                        // Nếu không tìm thấy, tạo logo giả để không làm hỏng script
                         const placeholder = new Image();
-                        placeholder.src = `https://placehold.co/250x80/ef4444/ffffff?text=THIEU+FILE+${brand.toUpperCase()}`;
+                        placeholder.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"></svg>`;
                         placeholder.onload = () => {
                             brandLogoImages[brand] = placeholder;
                             resolve();
@@ -254,7 +258,6 @@
                 await Promise.all(loadPromises);
                 logosPreloaded = true;
             } catch (error) {
-                console.error("Lỗi tải logo:", error);
                 logosPreloaded = true; 
             }
         }
@@ -269,7 +272,7 @@
                 const newFiles = Array.from(e.target.files);
                 
                 Swal.fire({
-                    title: 'Đang đọc EXIF hàng loạt...',
+                    title: 'Đang đọc EXIF...',
                     allowOutsideClick: false,
                     didOpen: () => { Swal.showLoading(); }
                 });
@@ -382,7 +385,7 @@
         }
 
         // =====================================
-        // PHẦN 3: LOGIC VẼ KHUNG ẢNH
+        // PHẦN 3: LOGIC VẼ KHUNG ẢNH (BẢN FIX LỖI KÍCH THƯỚC)
         // =====================================
         function drawBrandLogo(ctx, detectString, x, y, maxW, maxH, align='left') {
             if (!logosPreloaded) return; 
@@ -403,7 +406,7 @@
             else if (m.includes('xiaomi')) brandKey = 'xiaomi';
 
             const logoImg = brandLogoImages[brandKey];
-            if (!logoImg) return; 
+            if (!logoImg || !logoImg.width) return; 
 
             const w = logoImg.width;
             const h = logoImg.height;
@@ -423,7 +426,8 @@
             ctx.restore();
         }
 
-        function drawFrame(ctx, dataObj, style) {
+        // CHÚ Ý: Đã thêm tham số targetCanvas để ép nó vẽ theo kích thước Canvas cụ thể
+        function drawFrame(targetCanvas, ctx, dataObj, style) {
             const img = dataObj.imgObj;
             const exif = dataObj.exif;
             const iw = img.width; const ih = img.height;
@@ -435,40 +439,40 @@
             if (style === 'white-logo') {
                 const border = 150 * scale;
                 const bottomBorder = 300 * scale;
-                canvas.width = iw + border*2; canvas.height = ih + border + bottomBorder;
+                targetCanvas.width = iw + border*2; targetCanvas.height = ih + border + bottomBorder;
                 
-                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
                 ctx.drawImage(img, border, border, iw, ih);
                 
                 ctx.fillStyle = '#000'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
                 ctx.font = `bold ${50*scale}px sans-serif`;
-                ctx.fillText(exif.model, border, canvas.height - bottomBorder/2 - 20*scale);
+                ctx.fillText(exif.model, border, targetCanvas.height - bottomBorder/2 - 20*scale);
                 
                 ctx.fillStyle = '#666'; ctx.font = `normal ${35*scale}px sans-serif`;
-                ctx.fillText(exif.lens, border, canvas.height - bottomBorder/2 + 25*scale);
-                ctx.fillText(exifParams, border, canvas.height - bottomBorder/2 + 70*scale);
+                ctx.fillText(exif.lens, border, targetCanvas.height - bottomBorder/2 + 25*scale);
+                ctx.fillText(exifParams, border, targetCanvas.height - bottomBorder/2 + 70*scale);
                 
-                drawBrandLogo(ctx, brandDetectStr, canvas.width - border, canvas.height - bottomBorder/2, 280*scale, 90*scale, 'right');
+                drawBrandLogo(ctx, brandDetectStr, targetCanvas.width - border, targetCanvas.height - bottomBorder/2, 280*scale, 90*scale, 'right');
             
             } else if (style === 'dark-pro') {
                 const border = 100 * scale;
                 const bottomBorder = 250 * scale;
-                canvas.width = iw + border*2; canvas.height = ih + border + bottomBorder;
+                targetCanvas.width = iw + border*2; targetCanvas.height = ih + border + bottomBorder;
                 
-                ctx.fillStyle = '#111111'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#111111'; ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
                 ctx.drawImage(img, border, border, iw, ih);
                 
                 ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.font = `bold ${40*scale}px sans-serif`;
-                ctx.fillText(`${exif.make.toUpperCase()} ${exif.model}`, canvas.width/2, canvas.height - 120*scale);
+                ctx.fillText(`${exif.make.toUpperCase()} ${exif.model}`, targetCanvas.width/2, targetCanvas.height - 120*scale);
                 
                 ctx.fillStyle = '#aaa'; ctx.font = `normal ${30*scale}px monospace`;
-                ctx.fillText(exifParams, canvas.width/2, canvas.height - 60*scale);
+                ctx.fillText(exifParams, targetCanvas.width/2, targetCanvas.height - 60*scale);
                 
-                drawBrandLogo(ctx, brandDetectStr, canvas.width/2, canvas.height - 180*scale, 200*scale, 60*scale, 'center');
+                drawBrandLogo(ctx, brandDetectStr, targetCanvas.width/2, targetCanvas.height - 180*scale, 200*scale, 60*scale, 'center');
             
             } else if (style === 'overlay') {
-                canvas.width = iw; canvas.height = ih;
+                targetCanvas.width = iw; targetCanvas.height = ih;
                 ctx.drawImage(img, 0, 0, iw, ih);
                 
                 const grad = ctx.createLinearGradient(0, ih - 300*scale, 0, ih);
@@ -487,45 +491,45 @@
             } else if (style === 'polaroid') {
                 const border = 80 * scale;
                 const bottomBorder = 400 * scale;
-                canvas.width = iw + border*2; canvas.height = ih + border + bottomBorder;
+                targetCanvas.width = iw + border*2; targetCanvas.height = ih + border + bottomBorder;
                 
-                ctx.fillStyle = '#f9f9f9'; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 30; ctx.fillRect(0,0,canvas.width, canvas.height);
+                ctx.fillStyle = '#f9f9f9'; ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
+                ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 30; ctx.fillRect(0,0,targetCanvas.width, targetCanvas.height);
                 ctx.shadowColor = 'transparent';
                 
                 ctx.drawImage(img, border, border, iw, ih);
                 ctx.fillStyle = 'rgba(255, 150, 0, 0.05)'; ctx.fillRect(border, border, iw, ih);
 
-                drawBrandLogo(ctx, brandDetectStr, canvas.width/2, canvas.height - 250*scale, 200*scale, 70*scale, 'center');
+                drawBrandLogo(ctx, brandDetectStr, targetCanvas.width/2, targetCanvas.height - 250*scale, 200*scale, 70*scale, 'center');
 
                 ctx.fillStyle = '#333'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.font = `italic ${45*scale}px serif`;
-                ctx.fillText(exif.date, canvas.width/2, canvas.height - 140*scale);
+                ctx.fillText(exif.date, targetCanvas.width/2, targetCanvas.height - 140*scale);
                 
                 ctx.font = `normal ${35*scale}px monospace`;
-                ctx.fillText(`${exif.model} • ${exifParams}`, canvas.width/2, canvas.height - 70*scale);
+                ctx.fillText(`${exif.model} • ${exifParams}`, targetCanvas.width/2, targetCanvas.height - 70*scale);
 
             } else if (style === 'film') {
                 const barHeight = ih * 0.12; 
-                canvas.width = iw; canvas.height = ih + barHeight*2;
+                targetCanvas.width = iw; targetCanvas.height = ih + barHeight*2;
                 
-                ctx.fillStyle = '#000'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#000'; ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
                 ctx.drawImage(img, 0, barHeight, iw, ih);
                 
-                drawBrandLogo(ctx, brandDetectStr, canvas.width/2, barHeight/2, 220*scale, 70*scale, 'center');
+                drawBrandLogo(ctx, brandDetectStr, targetCanvas.width/2, barHeight/2, 220*scale, 70*scale, 'center');
 
                 ctx.fillStyle = '#eab308'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
                 ctx.font = `bold ${30*scale}px monospace`;
-                ctx.fillText(`[ ${exif.model.toUpperCase()} | ${exifParams} ]`, canvas.width/2, canvas.height - barHeight/2);
+                ctx.fillText(`[ ${exif.model.toUpperCase()} | ${exifParams} ]`, targetCanvas.width/2, targetCanvas.height - barHeight/2);
             
             } else if (style === 'minimal') {
                 const border = 60 * scale;
-                canvas.width = iw + border*2; canvas.height = ih + border*2;
-                ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+                targetCanvas.width = iw + border*2; targetCanvas.height = ih + border*2;
+                ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
                 ctx.drawImage(img, border, border, iw, ih);
                 
                 ctx.save();
-                ctx.translate(30*scale, canvas.height - border);
+                ctx.translate(30*scale, targetCanvas.height - border);
                 ctx.rotate(-Math.PI/2);
                 ctx.fillStyle = '#999'; ctx.font = `bold ${25*scale}px sans-serif`; ctx.textAlign = 'left';
                 ctx.fillText(`Shot on ${exif.model} — ${exifParams}`, 0, 0);
@@ -536,11 +540,12 @@
         function renderCanvasPreview() {
             if (fileDataArray.length === 0) return;
             const dataObj = fileDataArray[currentIndex];
-            drawFrame(ctx, dataObj, currentStyle);
+            // Truyền canvas xem trước (màn hình ngoài) vào để vẽ
+            drawFrame(canvas, ctx, dataObj, currentStyle);
         }
 
         // =====================================
-        // PHẦN 4: XUẤT ẢNH HÀNG LOẠT
+        // PHẦN 4: XUẤT ẢNH HÀNG LOẠT (BẢN FIX ZIP LỖI)
         // =====================================
         async function exportImages() {
             if (fileDataArray.length === 0) {
@@ -552,7 +557,7 @@
                 const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
                 const link = document.createElement('a');
                 link.href = dataUrl;
-                link.download = `HIP_EXIF_${fileDataArray[0].file.name}`;
+                link.download = `Cici_EXIF_${fileDataArray[0].file.name}`;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -572,7 +577,7 @@
 
             for (let i = 0; i < fileDataArray.length; i++) {
                 const blob = await processSingleFile(fileDataArray[i]);
-                zip.file(`HIP_EXIF_${fileDataArray[i].file.name}`, blob);
+                zip.file(`Cici_EXIF_${fileDataArray[i].file.name}`, blob);
                 
                 processedCount++;
                 Swal.getHtmlContainer().querySelector('b').textContent = processedCount;
@@ -583,7 +588,7 @@
             const zipContent = await zip.generateAsync({ type: "blob" });
             const link = document.createElement('a');
             link.href = URL.createObjectURL(zipContent);
-            link.download = `HIP_EXIF_Batch_${Date.now()}.zip`;
+            link.download = `Cici_EXIF_Batch_${Date.now()}.zip`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -593,16 +598,14 @@
 
         function processSingleFile(dataObj) {
             return new Promise((resolve) => {
+                // Tạo một canvas ảo hoàn toàn độc lập với canvas màn hình
                 const tempCanvas = document.createElement('canvas');
                 const tCtx = tempCanvas.getContext('2d');
                 
-                const realCanvas = window.canvas; 
-                window.canvas = tempCanvas; 
+                // Trực tiếp truyền tempCanvas vào để hàm vẽ khung tính toán đúng độ lớn
+                drawFrame(tempCanvas, tCtx, dataObj, currentStyle);
                 
-                drawFrame(tCtx, dataObj, currentStyle);
-                
-                window.canvas = realCanvas; 
-
+                // Chuyển đổi thành blob và nén vào zip
                 tempCanvas.toBlob((blob) => {
                     resolve(blob);
                 }, 'image/jpeg', 1.0);
