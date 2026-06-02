@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="./logos/logos.png">
+    <title>Cici Media Toolkits</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        /* --- HIỆU ỨNG NỀN SIÊU NHẸ (SUBTLE GRADIENT) --- */
+        body {
+            background-color: var(--bg-body);
+            background-image: radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.04) 0%, transparent 60%);
+            background-attachment: fixed; 
+        }
+
+        /* --- CẤU TRÚC ĐẨY FOOTER XUỐNG ĐÁY --- */
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            padding-top: 1rem;
+        }
+
+        /* --- HIỆU ỨNG ÁNH SÁNG HERO --- */
+        .hero-section {
+            position: relative;
+            text-align: center;
+            padding: 4rem 1rem 3.5rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 24px;
+            margin-bottom: 2rem;
+        }
+        .hero-glow {
+            position: absolute;
+            top: -50%; left: 50%;
+            transform: translateX(-50%);
+            width: 700px; height: 700px;
+            background: radial-gradient(circle, rgba(14,165,233,0.1) 0%, rgba(0,0,0,0) 60%);
+            z-index: 0;
+            pointer-events: none;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        /* --- TYPOGRAPHY --- */
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 0.4rem 1.2rem;
+            background: var(--bg-surface);
+            color: var(--accent);
+            border-radius: 50px;
+            font-size: 0.85rem; font-weight: 600;
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.02);
+        }
+        
+        .hero-title {
+            font-size: 3.8rem; font-weight: 800;
+            margin-bottom: 1rem; letter-spacing: -1.5px;
+            background: linear-gradient(135deg, var(--text-primary) 30%, var(--accent) 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            color: transparent;
+            -webkit-text-fill-color: transparent;
+        }
+        .hero-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.15rem; max-width: 600px;
+            margin: 0 auto; line-height: 1.6;
+        }
+
+        /* --- LƯỚI CÔNG CỤ (BENTO GRID) --- */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            padding-bottom: 3rem;
+            position: relative; z-index: 1;
+        }
+        
+        .tool-card {
+            background: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex; align-items: center; gap: 1.2rem;
+            text-decoration: none; color: var(--text-primary);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+            position: relative; overflow: hidden;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            background: rgba(var(--bg-surface-rgb), 0.7);
+        }
+        
+        .tool-card::before {
+            content: ''; position: absolute;
+            top: 0; left: -100%; width: 50%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(14,165,233,0.06), transparent);
+            transform: skewX(-20deg); transition: 0.6s ease-in-out;
+        }
+        
+        .tool-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 20px 30px -10px rgba(14,165,233,0.1), 0 8px 10px -6px rgba(14,165,233,0.05);
+        }
+        .tool-card:hover::before { left: 150%; }
+
+        .tool-icon-wrap {
+            width: 56px; height: 56px; flex-shrink: 0;
+            border-radius: 14px;
+            background: rgba(14,165,233,0.08); color: var(--accent);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.8rem; transition: all 0.3s;
+        }
+        .tool-card:hover .tool-icon-wrap {
+            background: var(--accent); color: white;
+            transform: scale(1.05) rotate(-5deg);
+            box-shadow: 0 10px 15px rgba(14,165,233,0.2);
+        }
+
+        .tool-info { flex: 1; }
+        .tool-title {
+            font-size: 1.1rem; font-weight: 700; margin-bottom: 0.25rem;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .tool-desc {
+            font-size: 0.85rem; color: var(--text-secondary); line-height: 1.5;
+        }
+
+        .tool-arrow {
+            color: var(--text-secondary); font-size: 1.2rem;
+            opacity: 0; transform: translateX(-15px); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .tool-card:hover .tool-arrow {
+            opacity: 1; transform: translateX(0); color: var(--accent);
+        }
+        
+        /* --- FOOTER FIX DƯỚI CÙNG --- */
+        .home-footer {
+            text-align: center; padding: 2rem 0;
+            color: var(--text-secondary); font-size: 0.85rem;
+            border-top: 1px solid var(--border-color);
+            margin-top: auto; 
+            position: relative; z-index: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <header class="mobile-header">
+            <div class="mobile-brand">
+                <img src="https://cicivn.io.vn/assets/images/branding/logo-placeholder.png" alt="Cici Media">
+            </div>
+            <i class="ph ph-list menu-toggle" id="mobile-menu-btn"></i>
+        </header>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <img src="https://cicivn.io.vn/assets/images/branding/logo-placeholder.png" alt="Cici Media Logo" class="brand-logo">
+            </div>
+
+            <nav class="menu">
+                <div class="menu-label">MENU CHÍNH</div>
+                <a href="index.html" class="menu-item active"><i class="ph ph-squares-four"></i> Tổng quan</a>
+                <a href="exif-frame.html" class="menu-item"><i class="ph ph-camera"></i>Khung Ảnh EXIF</a>
+                <a href="watermark.html" class="menu-item"><i class="ph ph-image"></i> Chèn Watermark</a>
+                <a href="photo-editor.html" class="menu-item"><i class="ph ph-aperture"></i> Photo Editor</a>
+                <a href="dslrbooth-frame.html" class="menu-item"><i class="ph ph-bounding-box"></i> Frame DSLRBooth</a>
+                <a href="qr-generator.html" class="menu-item"><i class="ph ph-qr-code"></i> Mã QR Tool</a>
+                <a href="typing-test.html" class="menu-item"><i class="ph ph-keyboard"></i> Typing Test</a>
+                <a href="lucky-draw.html" class="menu-item"><i class="ph ph-gift"></i> Vòng Quay & Bốc Thăm</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="menu-item" id="theme-toggle"><i class="ph ph-moon"></i> Đổi Giao Diện</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            
+            <section class="hero-section">
+                <div class="hero-glow"></div>
+                <div class="hero-content">
+                    <div class="hero-badge">
+                        <span style="width: 8px; height: 8px; background: #10b981; border-radius: 50%; display: inline-block;"></span>
+                        Bộ công cụ trực tuyến miễn phí
+                    </div>
+                    <h1 class="hero-title">Cici Toolkits</h1>
+                    <p class="hero-subtitle">Bộ công cụ Vibe Coding by Cici Media hoàn toàn miễn phí.</p>
+                </div>
+            </section>
+
+            <section class="tool-grid">
+                
+                <a href="exif-frame.html" class="tool-card">
+                    <div class="tool-icon-wrap"><i class="ph ph-camera"></i></div>
+                    <div class="tool-info">
+                        <div class="tool-title">Khung Ảnh EXIF <i class="ph-bold ph-arrow-right tool-arrow"></i></div>
+                        <div class="tool-desc">Đọc thông số máy ảnh, tự động thêm logo Sony, Lumix, Canon, Google Pixel...</div>
+                    </div>
+                </a>
+
+                <a href="watermark.html" class="tool-card">
+                    <div class="tool-icon-wrap"><i class="ph ph-image"></i></div>
+                    <div class="tool-info">
+                        <div class="tool-title">Chèn Watermark <i class="ph-bold ph-arrow-right tool-arrow"></i></div>
+                        <div class="tool-desc">Đóng dấu bản quyền hàng loạt dạng lưới bảo vệ ảnh chống ăn cắp.</div>
+                    </div>
+                </a>
+
+                <a href="photo-editor.html" class="tool-card">
+                    <div class="tool-icon-wrap"><i class="ph ph-sliders-horizontal"></i></div>
+                    <div class="tool-info">
+                        <div class="tool-title">Photo Editor <i class="ph-bold ph-arrow-right tool-arrow"></i></div>
+                        <div class="tool-desc">Chỉnh sửa độ sáng, màu sắc, cắt ghép và thêm filter ảnh nhanh chóng.</div>
+                    </div>
+                </a>
+
+                <a href="dslrbooth-frame.html" class="tool-card">
+                    <div class="tool-icon-wrap"><i class="ph ph-bounding-box"></i></div>
+                    <div class="tool-info">
+                        <div class="tool-title">DSLRBooth Frame <i class="ph-bold ph-arrow-right tool-arrow"></i></div>
+                        <div class="tool-desc">Tạo khung overlay đục lỗ trong suốt chuẩn PNG cho app Photobooth.</div>
+                    </div>
+                </a>
+
+                <a href="qr-generator.html" class="tool-card">
+                    <div class="tool-icon-wrap"><i class="ph ph-qr-code"></i></div>
+                    <div class="tool-info">
+                        <div class="tool-title">QR Generator <i class="ph-bold ph-arrow-right tool-arrow"></i></div>
+                        <div class="tool-desc">Tạo mã QR cho Website, WiFi, Ngân hàng kèm logo ở giữa.</div>
+                    </div>
+                </a>
+
+                <a href="lucky-draw.html" class="tool-card">
+                    <div class="tool-icon-wrap"><i class="ph ph-gift"></i></div>
+                    <div class="tool-info">
+                        <div class="tool-title">Vòng Quay May Mắn <i class="ph-bold ph-arrow-right tool-arrow"></i></div>
+                        <div class="tool-desc">Tổ chức mini-game bốc thăm trúng thưởng, có hiệu ứng pháo hoa.</div>
+                    </div>
+                </a>
+
+                <a href="typing-test.html" class="tool-card">
+                    <div class="tool-icon-wrap"><i class="ph ph-keyboard"></i></div>
+                    <div class="tool-info">
+                        <div class="tool-title">Typing Test <i class="ph-bold ph-arrow-right tool-arrow"></i></div>
+                        <div class="tool-desc">Kiểm tra tốc độ gõ phím WPM tiếng Việt chuẩn xác.</div>
+                    </div>
+                </a>
+
+            </section>
+
+            <footer class="home-footer">
+                © 2026 Cici Media. Tất cả công cụ tại một nơi.
+            </footer>
+
+        </main>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

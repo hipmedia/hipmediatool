@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Khung Ảnh EXIF | Cici Media</title>
+    
+    <link rel="icon" type="image/png" href="logos/cicimedia.png">
+    
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/exifr/dist/full.umd.js"></script>
+    <style>
+        .tool-layout { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .controls-panel {
+            flex: 1; min-width: 320px; background: var(--bg-surface); padding: 1.5rem;
+            border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
+            display: flex; flex-direction: column; gap: 1.5rem;
+        }
+        .preview-panel {
+            flex: 1.5; min-width: 320px; background: #111; padding: 1rem;
+            border-radius: 16px; border: 1px solid var(--border-color);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            overflow: hidden; box-shadow: var(--shadow); position: relative;
+        }
+        
+        #preview-canvas {
+            max-width: 100%; max-height: 65vh; object-fit: contain;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.5); display: none;
+        }
+        
+        .upload-box {
+            border: 2px dashed var(--border-color); border-radius: 12px;
+            padding: 1.5rem 1rem; text-align: center; cursor: pointer;
+            transition: var(--transition); background: var(--bg-body); position: relative;
+        }
+        .upload-box:hover { border-color: var(--accent); background: var(--accent-light); }
+        .upload-box input[type="file"] { display: none; }
+        
+        .frame-grid {
+            display: grid; grid-template-columns: repeat(2, 1fr); gap: 0.8rem;
+        }
+        .frame-btn {
+            background: var(--bg-body); border: 2px solid var(--border-color);
+            padding: 1rem; border-radius: 8px; cursor: pointer; color: var(--text-primary);
+            font-size: 0.95rem; font-weight: 600; transition: var(--transition);
+            display: flex; flex-direction: column; align-items: center; gap: 0.5rem;
+        }
+        .frame-btn i { font-size: 1.8rem; color: var(--text-secondary); }
+        .frame-btn.active { 
+            background: var(--accent-light); color: var(--accent); 
+            border-color: var(--accent); 
+        }
+        .frame-btn.active i { color: var(--accent); }
+        
+        #empty-preview { color: #666; text-align: center; }
+        .badge-count {
+            position: absolute; top: -10px; right: -10px; background: var(--accent);
+            color: white; font-weight: bold; font-size: 0.8rem; padding: 0.2rem 0.6rem;
+            border-radius: 20px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .thumbnail-gallery {
+            width: 100%; display: flex; gap: 0.8rem; overflow-x: auto;
+            margin-top: 1rem; padding: 12px 12px 0.5rem 0; align-items: center;
+        }
+        .thumbnail-gallery::-webkit-scrollbar { height: 6px; }
+        .thumbnail-gallery::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; }
+        
+        .thumb-wrapper {
+            position: relative; width: 60px; height: 60px; flex-shrink: 0;
+            border-radius: 8px; border: 2px solid transparent; transition: all 0.2s;
+        }
+        .thumb-wrapper.active { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-light); }
+        .thumb-img {
+            width: 100%; height: 100%; object-fit: cover; border-radius: 6px;
+            cursor: pointer; opacity: 0.5; transition: all 0.2s;
+        }
+        .thumb-wrapper.active .thumb-img { opacity: 1; }
+        .thumb-wrapper:hover .thumb-img { opacity: 0.8; }
+        
+        .thumb-del-btn {
+            position: absolute; top: -10px; right: -10px;
+            width: 22px; height: 22px; background: #ef4444; border-radius: 50%; color: white;
+            display: none; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 0.85rem; font-weight: bold; z-index: 5; border: 2px solid #111;
+        }
+        .thumb-wrapper:hover .thumb-del-btn { display: flex; }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <header class="mobile-header">
+            <div class="mobile-brand">
+                <img src="logos/logos.png" alt="Cici Media">
+            </div>
+            <i class="ph ph-list menu-toggle" id="mobile-menu-btn"></i>
+        </header>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <img src="logos/logos.png" alt="Cici Media Logo" class="brand-logo">
+            </div>
+
+            <nav class="menu">
+                <div class="menu-label">MENU CHÍNH</div>
+                <a href="index.html" class="menu-item"><i class="ph ph-squares-four"></i> Tổng quan</a>
+                <a href="exif-frame.html" class="menu-item active"><i class="ph ph-camera"></i> Khung Ảnh EXIF</a>
+                <a href="watermark.html" class="menu-item"><i class="ph ph-image"></i> Chèn Watermark</a>
+                <a href="photo-editor.html" class="menu-item"><i class="ph ph-aperture"></i> Photo Editor</a>
+                <a href="dslrbooth-frame.html" class="menu-item"><i class="ph ph-bounding-box"></i> Frame DSLRBooth</a>
+                <a href="qr-generator.html" class="menu-item"><i class="ph ph-qr-code"></i> Mã QR Tool</a>
+                <a href="typing-test.html" class="menu-item"><i class="ph ph-keyboard"></i> Typing Test</a>
+                <a href="lucky-draw.html" class="menu-item"><i class="ph ph-gift"></i> Vòng Quay & Bốc Thăm</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="menu-item" id="theme-toggle"><i class="ph ph-moon"></i> Đổi Giao Diện</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar" style="margin-bottom: 2rem;">
+                <div>
+                    <h1 class="page-title">Khung Ảnh EXIF Hãng</h1>
+                    <p class="page-subtitle">Tự động nạp logo hãng máy ảnh/điện thoại thực tế.</p>
+                </div>
+            </header>
+
+            <div class="tool-layout">
+                <div class="controls-panel">
+                    <div>
+                        <div class="upload-box" onclick="document.getElementById('main-image-upload').click()">
+                            <span class="badge-count" id="image-count-badge">0</span>
+                            <i class="ph ph-images" style="font-size: 2.5rem; color: var(--accent);"></i>
+                            <p id="image-upload-text" style="margin-top: 0.5rem; font-weight: 500;">1. Chọn Ảnh Gốc (Thêm nhiều ảnh)</p>
+                            <input type="file" id="main-image-upload" accept="image/*" multiple>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label style="font-weight: 600; font-size: 0.95rem; margin-bottom: 0.8rem; display: block;">2. Chọn phong cách viền</label>
+                        <div class="frame-grid">
+                            <button class="frame-btn active" data-style="white-logo">
+                                <i class="ph ph-app-window"></i> Viền Trắng + Logo
+                            </button>
+                            <button class="frame-btn" data-style="dark-pro">
+                                <i class="ph-fill ph-app-window"></i> Viền Tối Pro
+                            </button>
+                            <button class="frame-btn" data-style="film">
+                                <i class="ph ph-film-strip"></i> Màu Phim
+                            </button>
+                            <button class="frame-btn" data-style="polaroid">
+                                <i class="ph ph-polaroid"></i> Polaroid Cổ điển
+                            </button>
+                            <button class="frame-btn" data-style="overlay">
+                                <i class="ph ph-text-t"></i> Chữ Overlay chìm
+                            </button>
+                            <button class="frame-btn" data-style="minimal">
+                                <i class="ph ph-frame-corners"></i> Tối giản (Minimal)
+                            </button>
+                        </div>
+                    </div>
+
+                    <button id="export-btn" onclick="exportImages()" class="tool-btn" style="width: 100%; margin-top: auto; padding: 1.2rem;">
+                        <i class="ph ph-download-simple"></i> Xuất ảnh
+                    </button>
+                </div>
+
+                <div class="preview-panel">
+                    <div id="empty-preview">
+                        <i class="ph ph-camera-slash" style="font-size: 4rem; opacity: 0.5;"></i>
+                        <p style="margin-top: 1rem;">Vui lòng tải ảnh gốc để phần mềm đọc EXIF</p>
+                    </div>
+                    
+                    <div id="preview-header" style="display: none; position: absolute; top: 1rem; left: 1rem; background: rgba(0,0,0,0.6); padding: 0.5rem 1rem; border-radius: 8px; color: white; font-size: 0.85rem; z-index: 10;">
+                        Đang xem trước ảnh
+                    </div>
+                    
+                    <canvas id="preview-canvas"></canvas>
+
+                    <div id="thumbnail-list" class="thumbnail-gallery" style="display: none;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="script.js"></script>
+    <script>
+        const canvas = document.getElementById('preview-canvas');
+        const ctx = canvas.getContext('2d');
+        const emptyPreview = document.getElementById('empty-preview');
+        const exportBtn = document.getElementById('export-btn');
+        const thumbnailList = document.getElementById('thumbnail-list');
+        const previewHeader = document.getElementById('preview-header');
+        
+        let selectedFiles = []; 
+        let fileDataArray = []; 
+        let currentStyle = 'white-logo';
+        let currentIndex = 0;
+
+        const frameButtons = document.querySelectorAll('.frame-btn');
+
+        frameButtons.forEach(btn => {
+            btn.addEventListener('click', () => {
+                frameButtons.forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentStyle = btn.dataset.style;
+                renderCanvasPreview();
+            });
+        });
+
+        // =====================================
+        // PHẦN 1: TẢI TRƯỚC LOGO HÌNH ẢNH
+        // =====================================
+        const brandLogos = {
+            leica: './logos/leica.png',
+            zeiss: './logos/zeiss.png',
+            lumix: './logos/lumix.png',
+            panasonic: './logos/panasonic.png',
+            canon: './logos/canon.png',
+            nikon: './logos/nikon.png',
+            sony: './logos/sony.png',
+            fujifilm: './logos/fujifilm.png',
+            apple: './logos/apple.png',
+            google: './logos/google.png',
+            samsung: './logos/samsung.png',
+            xiaomi: './logos/xiaomi.png',
+            unknown: './logos/unknown.png' 
+        };
+
+        const brandLogoImages = {}; 
+        let logosPreloaded = false;
+
+        async function preloadLogos() {
+            const loadPromises = Object.entries(brandLogos).map(([brand, url]) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        brandLogoImages[brand] = img;
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        // Nếu không tìm thấy, tạo logo giả để không làm hỏng script
+                        const placeholder = new Image();
+                        placeholder.src = `data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="10"></svg>`;
+                        placeholder.onload = () => {
+                            brandLogoImages[brand] = placeholder;
+                            resolve();
+                        };
+                    };
+                    img.src = url;
+                });
+            });
+
+            try {
+                await Promise.all(loadPromises);
+                logosPreloaded = true;
+            } catch (error) {
+                logosPreloaded = true; 
+            }
+        }
+
+        document.addEventListener("DOMContentLoaded", preloadLogos);
+
+        // =====================================
+        // PHẦN 2: QUẢN LÝ ẢNH & ĐỌC EXIF
+        // =====================================
+        document.getElementById('main-image-upload').addEventListener('change', async function(e) {
+            if(e.target.files.length > 0) {
+                const newFiles = Array.from(e.target.files);
+                
+                Swal.fire({
+                    title: 'Đang đọc EXIF...',
+                    allowOutsideClick: false,
+                    didOpen: () => { Swal.showLoading(); }
+                });
+
+                for (let file of newFiles) {
+                    const img = await loadImage(file);
+                    let exif = await exifr.parse(file, {tiff: true, exif: true}).catch(() => null);
+                    
+                    let exifClean = {
+                        make: exif?.Make || "Unknown",
+                        model: exif?.Model || "Camera",
+                        lens: exif?.LensModel || "",
+                        iso: exif?.ISO ? `ISO ${exif.ISO}` : "",
+                        aperture: exif?.FNumber ? `f/${exif.FNumber}` : "",
+                        speed: exif?.ExposureTime ? (exif.ExposureTime < 1 ? `1/${Math.round(1/exif.ExposureTime)}s` : `${exif.ExposureTime}s`) : "",
+                        focal: exif?.FocalLength ? `${exif.FocalLength}mm` : "",
+                        date: exif?.DateTimeOriginal ? new Date(exif.DateTimeOriginal).toLocaleDateString('vi-VN') : "No Date"
+                    };
+
+                    fileDataArray.push({ file, imgObj: img, exif: exifClean });
+                }
+
+                Swal.close();
+                updateUIManager();
+                selectPreviewImage(fileDataArray.length - newFiles.length);
+            }
+            this.value = '';
+        });
+
+        function loadImage(file) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        function updateUIManager() {
+            if (fileDataArray.length === 0) {
+                document.getElementById('image-count-badge').style.display = 'none';
+                document.getElementById('image-upload-text').innerText = `1. Chọn Ảnh Gốc (Thêm nhiều ảnh)`;
+                exportBtn.innerHTML = `<i class="ph ph-download-simple"></i> Xuất ảnh`;
+                thumbnailList.style.display = 'none';
+                canvas.style.display = 'none';
+                emptyPreview.style.display = 'block';
+                previewHeader.style.display = 'none';
+                return;
+            }
+
+            document.getElementById('image-count-badge').style.display = 'block';
+            document.getElementById('image-count-badge').innerText = fileDataArray.length;
+            document.getElementById('image-upload-text').innerText = `Đã chọn ${fileDataArray.length} ảnh`;
+            
+            exportBtn.innerHTML = fileDataArray.length > 1 
+                ? `<i class="ph ph-file-zip"></i> Xuất ${fileDataArray.length} ảnh (ZIP)` 
+                : `<i class="ph ph-download-simple"></i> Xuất ảnh`;
+
+            renderThumbnails();
+        }
+
+        function renderThumbnails() {
+            thumbnailList.innerHTML = '';
+            thumbnailList.style.display = 'flex';
+            
+            fileDataArray.forEach((data, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'thumb-wrapper';
+                if(index === currentIndex) wrapper.classList.add('active');
+
+                const imgThumb = document.createElement('img');
+                imgThumb.className = 'thumb-img';
+                imgThumb.src = data.imgObj.src; 
+                
+                const delBtn = document.createElement('div');
+                delBtn.className = 'thumb-del-btn';
+                delBtn.innerHTML = '<i class="ph-bold ph-x"></i>';
+                
+                imgThumb.onclick = () => selectPreviewImage(index);
+                delBtn.onclick = (e) => { e.stopPropagation(); removeImage(index); };
+
+                wrapper.appendChild(imgThumb);
+                wrapper.appendChild(delBtn);
+                thumbnailList.appendChild(wrapper);
+            });
+        }
+
+        function removeImage(index) {
+            fileDataArray.splice(index, 1);
+            if (fileDataArray.length > 0) {
+                if (currentIndex >= fileDataArray.length) currentIndex = fileDataArray.length - 1; 
+                else if (index < currentIndex) currentIndex--; 
+                updateUIManager(); selectPreviewImage(currentIndex);
+            } else { updateUIManager(); }
+        }
+
+        function selectPreviewImage(index) {
+            currentIndex = index;
+            document.querySelectorAll('.thumb-wrapper').forEach((el, i) => {
+                el.classList.toggle('active', i === index);
+            });
+            
+            previewHeader.style.display = 'block';
+            let shortName = fileDataArray[index].file.name;
+            if (shortName.length > 20) shortName = shortName.substring(0, 17) + '...';
+            previewHeader.innerText = `Ảnh ${index + 1}/${fileDataArray.length}: ${shortName}`;
+
+            emptyPreview.style.display = 'none';
+            canvas.style.display = 'block';
+            renderCanvasPreview();
+        }
+
+        // =====================================
+        // PHẦN 3: LOGIC VẼ KHUNG ẢNH (BẢN FIX LỖI KÍCH THƯỚC)
+        // =====================================
+        function drawBrandLogo(ctx, detectString, x, y, maxW, maxH, align='left') {
+            if (!logosPreloaded) return; 
+
+            const m = detectString.toLowerCase();
+            let brandKey = 'unknown';
+
+            if (m.includes('leica')) brandKey = 'leica';
+            else if (m.includes('zeiss')) brandKey = 'zeiss';
+            else if (m.includes('lumix') || m.includes('panasonic') || m.includes('dc-') || m.includes('dmc-')) brandKey = 'lumix';
+            else if (m.includes('canon')) brandKey = 'canon';
+            else if (m.includes('nikon')) brandKey = 'nikon';
+            else if (m.includes('sony')) brandKey = 'sony';
+            else if (m.includes('fujifilm')) brandKey = 'fujifilm';
+            else if (m.includes('apple') || m.includes('iphone')) brandKey = 'apple';
+            else if (m.includes('google') || m.includes('pixel')) brandKey = 'google';
+            else if (m.includes('samsung')) brandKey = 'samsung';
+            else if (m.includes('xiaomi')) brandKey = 'xiaomi';
+
+            const logoImg = brandLogoImages[brandKey];
+            if (!logoImg || !logoImg.width) return; 
+
+            const w = logoImg.width;
+            const h = logoImg.height;
+            const ratio = Math.min(maxW / w, maxH / h);
+            const finalW = w * ratio;
+            const finalH = h * ratio;
+
+            let drawX = x;
+            if(align === 'center') drawX = x - finalW / 2;
+            if(align === 'right') drawX = x - finalW;
+
+            ctx.save();
+            if (currentStyle === 'dark-pro' || currentStyle === 'overlay' || currentStyle === 'film') {
+                ctx.filter = 'invert(1) grayscale(1) brightness(1.5)'; 
+            }
+            ctx.drawImage(logoImg, drawX, y - finalH / 2, finalW, finalH);
+            ctx.restore();
+        }
+
+        // CHÚ Ý: Đã thêm tham số targetCanvas để ép nó vẽ theo kích thước Canvas cụ thể
+        function drawFrame(targetCanvas, ctx, dataObj, style) {
+            const img = dataObj.imgObj;
+            const exif = dataObj.exif;
+            const iw = img.width; const ih = img.height;
+            const scale = Math.max(iw, ih) / 1500; 
+            
+            let exifParams = [exif.focal, exif.aperture, exif.speed, exif.iso].filter(Boolean).join("  |  ");
+            let brandDetectStr = `${exif.make} ${exif.model} ${exif.lens}`;
+            
+            if (style === 'white-logo') {
+                const border = 150 * scale;
+                const bottomBorder = 300 * scale;
+                targetCanvas.width = iw + border*2; targetCanvas.height = ih + border + bottomBorder;
+                
+                ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
+                ctx.drawImage(img, border, border, iw, ih);
+                
+                ctx.fillStyle = '#000'; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+                ctx.font = `bold ${50*scale}px sans-serif`;
+                ctx.fillText(exif.model, border, targetCanvas.height - bottomBorder/2 - 20*scale);
+                
+                ctx.fillStyle = '#666'; ctx.font = `normal ${35*scale}px sans-serif`;
+                ctx.fillText(exif.lens, border, targetCanvas.height - bottomBorder/2 + 25*scale);
+                ctx.fillText(exifParams, border, targetCanvas.height - bottomBorder/2 + 70*scale);
+                
+                drawBrandLogo(ctx, brandDetectStr, targetCanvas.width - border, targetCanvas.height - bottomBorder/2, 280*scale, 90*scale, 'right');
+            
+            } else if (style === 'dark-pro') {
+                const border = 100 * scale;
+                const bottomBorder = 250 * scale;
+                targetCanvas.width = iw + border*2; targetCanvas.height = ih + border + bottomBorder;
+                
+                ctx.fillStyle = '#111111'; ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
+                ctx.drawImage(img, border, border, iw, ih);
+                
+                ctx.fillStyle = '#fff'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.font = `bold ${40*scale}px sans-serif`;
+                ctx.fillText(`${exif.make.toUpperCase()} ${exif.model}`, targetCanvas.width/2, targetCanvas.height - 120*scale);
+                
+                ctx.fillStyle = '#aaa'; ctx.font = `normal ${30*scale}px monospace`;
+                ctx.fillText(exifParams, targetCanvas.width/2, targetCanvas.height - 60*scale);
+                
+                drawBrandLogo(ctx, brandDetectStr, targetCanvas.width/2, targetCanvas.height - 180*scale, 200*scale, 60*scale, 'center');
+            
+            } else if (style === 'overlay') {
+                targetCanvas.width = iw; targetCanvas.height = ih;
+                ctx.drawImage(img, 0, 0, iw, ih);
+                
+                const grad = ctx.createLinearGradient(0, ih - 300*scale, 0, ih);
+                grad.addColorStop(0, "rgba(0,0,0,0)"); grad.addColorStop(1, "rgba(0,0,0,0.8)");
+                ctx.fillStyle = grad; ctx.fillRect(0, ih - 300*scale, iw, 300*scale);
+                
+                ctx.fillStyle = '#fff'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+                ctx.font = `bold ${50*scale}px sans-serif`;
+                ctx.fillText(exif.model, iw - 50*scale, ih - 100*scale);
+                
+                ctx.fillStyle = '#ccc'; ctx.font = `normal ${35*scale}px sans-serif`;
+                ctx.fillText(exifParams, iw - 50*scale, ih - 50*scale);
+                
+                drawBrandLogo(ctx, brandDetectStr, 50*scale, ih - 100*scale, 200*scale, 60*scale, 'left');
+
+            } else if (style === 'polaroid') {
+                const border = 80 * scale;
+                const bottomBorder = 400 * scale;
+                targetCanvas.width = iw + border*2; targetCanvas.height = ih + border + bottomBorder;
+                
+                ctx.fillStyle = '#f9f9f9'; ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
+                ctx.shadowColor = 'rgba(0,0,0,0.1)'; ctx.shadowBlur = 30; ctx.fillRect(0,0,targetCanvas.width, targetCanvas.height);
+                ctx.shadowColor = 'transparent';
+                
+                ctx.drawImage(img, border, border, iw, ih);
+                ctx.fillStyle = 'rgba(255, 150, 0, 0.05)'; ctx.fillRect(border, border, iw, ih);
+
+                drawBrandLogo(ctx, brandDetectStr, targetCanvas.width/2, targetCanvas.height - 250*scale, 200*scale, 70*scale, 'center');
+
+                ctx.fillStyle = '#333'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.font = `italic ${45*scale}px serif`;
+                ctx.fillText(exif.date, targetCanvas.width/2, targetCanvas.height - 140*scale);
+                
+                ctx.font = `normal ${35*scale}px monospace`;
+                ctx.fillText(`${exif.model} • ${exifParams}`, targetCanvas.width/2, targetCanvas.height - 70*scale);
+
+            } else if (style === 'film') {
+                const barHeight = ih * 0.12; 
+                targetCanvas.width = iw; targetCanvas.height = ih + barHeight*2;
+                
+                ctx.fillStyle = '#000'; ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
+                ctx.drawImage(img, 0, barHeight, iw, ih);
+                
+                drawBrandLogo(ctx, brandDetectStr, targetCanvas.width/2, barHeight/2, 220*scale, 70*scale, 'center');
+
+                ctx.fillStyle = '#eab308'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.font = `bold ${30*scale}px monospace`;
+                ctx.fillText(`[ ${exif.model.toUpperCase()} | ${exifParams} ]`, targetCanvas.width/2, targetCanvas.height - barHeight/2);
+            
+            } else if (style === 'minimal') {
+                const border = 60 * scale;
+                targetCanvas.width = iw + border*2; targetCanvas.height = ih + border*2;
+                ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, targetCanvas.width, targetCanvas.height);
+                ctx.drawImage(img, border, border, iw, ih);
+                
+                ctx.save();
+                ctx.translate(30*scale, targetCanvas.height - border);
+                ctx.rotate(-Math.PI/2);
+                ctx.fillStyle = '#999'; ctx.font = `bold ${25*scale}px sans-serif`; ctx.textAlign = 'left';
+                ctx.fillText(`Shot on ${exif.model} — ${exifParams}`, 0, 0);
+                ctx.restore();
+            }
+        }
+
+        function renderCanvasPreview() {
+            if (fileDataArray.length === 0) return;
+            const dataObj = fileDataArray[currentIndex];
+            // Truyền canvas xem trước (màn hình ngoài) vào để vẽ
+            drawFrame(canvas, ctx, dataObj, currentStyle);
+        }
+
+        // =====================================
+        // PHẦN 4: XUẤT ẢNH HÀNG LOẠT (BẢN FIX ZIP LỖI)
+        // =====================================
+        async function exportImages() {
+            if (fileDataArray.length === 0) {
+                Swal.fire('Lỗi', 'Vui lòng chọn ảnh trước!', 'warning');
+                return;
+            }
+
+            if (fileDataArray.length === 1) {
+                const dataUrl = canvas.toDataURL('image/jpeg', 1.0);
+                const link = document.createElement('a');
+                link.href = dataUrl;
+                link.download = `Cici_EXIF_${fileDataArray[0].file.name}`;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã lưu ảnh!', showConfirmButton: false, timer: 2000 });
+                return;
+            }
+
+            const zip = new JSZip();
+            let processedCount = 0;
+
+            Swal.fire({
+                title: 'Đang tạo khung hàng loạt...',
+                html: `Vui lòng không đóng trang. <br><br>Đã xử lý: <b style="color:var(--accent); font-size:1.5rem;">0</b> / ${fileDataArray.length}`,
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            for (let i = 0; i < fileDataArray.length; i++) {
+                const blob = await processSingleFile(fileDataArray[i]);
+                zip.file(`Cici_EXIF_${fileDataArray[i].file.name}`, blob);
+                
+                processedCount++;
+                Swal.getHtmlContainer().querySelector('b').textContent = processedCount;
+            }
+
+            Swal.getHtmlContainer().innerHTML = "Đang nén file ZIP, vui lòng chờ...";
+            
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(zipContent);
+            link.download = `Cici_EXIF_Batch_${Date.now()}.zip`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+
+            Swal.fire('Thành công!', `Đã tạo khung cho ${fileDataArray.length} ảnh.`, 'success');
+        }
+
+        function processSingleFile(dataObj) {
+            return new Promise((resolve) => {
+                // Tạo một canvas ảo hoàn toàn độc lập với canvas màn hình
+                const tempCanvas = document.createElement('canvas');
+                const tCtx = tempCanvas.getContext('2d');
+                
+                // Trực tiếp truyền tempCanvas vào để hàm vẽ khung tính toán đúng độ lớn
+                drawFrame(tempCanvas, tCtx, dataObj, currentStyle);
+                
+                // Chuyển đổi thành blob và nén vào zip
+                tempCanvas.toBlob((blob) => {
+                    resolve(blob);
+                }, 'image/jpeg', 1.0);
+            });
+        }
+    </script>
+</body>
+</html>

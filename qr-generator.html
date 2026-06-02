@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo & Quét Mã QR | Cici Media</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" href="./logos/logos.png">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://unpkg.com/easyqrcodejs@4.6.1/dist/easy.qrcode.min.js"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+</head>
+<body>
+    <div class="app-layout">
+        <header class="mobile-header">
+            <div class="mobile-brand">
+                <img src="https://cicivn.io.vn/assets/images/branding/logo-placeholder.png" alt="Cici Media">
+            </div>
+            <i class="ph ph-list menu-toggle" id="mobile-menu-btn"></i>
+        </header>
+    <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="brand">
+                <img src="https://cicivn.io.vn/assets/images/branding/logo-placeholder.png" alt="Cici Media Logo" class="brand-logo">
+            </div>
+            <nav class="menu">
+                <div class="menu-label">MENU CHÍNH</div>
+                <a href="index.html" class="menu-item"><i class="ph ph-squares-four"></i> Tổng quan</a>
+                <a href="exif-frame.html" class="menu-item"><i class="ph ph-camera"></i>Khung Ảnh EXIF</a>
+                <a href="watermark.html" class="menu-item"><i class="ph ph-image"></i> Chèn Watermark</a>
+                <a href="photo-editor.html" class="menu-item"><i class="ph ph-aperture"></i> Photo Editor</a>
+                <a href="dslrbooth-frame.html" class="menu-item"><i class="ph ph-bounding-box"></i> Frame DSLRBooth</a>
+                <a href="qr-generator.html" class="menu-item active"><i class="ph ph-qr-code"></i> Mã QR Tool</a>
+                <a href="typing-test.html" class="menu-item"><i class="ph ph-keyboard"></i> Typing Test</a>
+                <a href="lucky-draw.html" class="menu-item"><i class="ph ph-gift"></i> Vòng Quay & Bốc Thăm</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="menu-item" id="theme-toggle"><i class="ph ph-moon"></i> Đổi Giao Diện</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar" style="margin-bottom: 1rem;">
+                <div>
+                    <h1 class="page-title">Công Cụ Mã QR</h1>
+                </div>
+            </header>
+
+            <div class="tabs">
+                <button class="tab-btn active" onclick="switchTab('create')"><i class="ph ph-magic-wand"></i> Tạo Mã QR</button>
+                <button class="tab-btn" onclick="switchTab('scan')"><i class="ph ph-scan"></i> Quét Mã QR</button>
+            </div>
+
+            <div id="tab-create" class="tab-content active">
+                <div class="tool-container" style="max-width: 800px;">
+                    <div style="display: flex; flex-direction: column; gap: 1.5rem;">
+                        <div>
+                            <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">1. Nội dung (URL / Text) <span style="color: var(--danger);">*</span></label>
+                            <input type="text" id="qr-input" class="tool-input" placeholder="Nhập đường link (VD: https://google.com)">
+                        </div>
+
+                        <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
+                            <div style="flex: 1; min-width: 250px;">
+                                <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">2. Tải Logo từ thiết bị (Tuỳ chọn)</label>
+                                <input type="file" id="qr-logo-file" class="tool-input" accept="image/*" style="padding: 0.75rem;">
+                            </div>
+                            <div style="flex: 1; min-width: 250px;">
+                                <label style="font-weight: 600; margin-bottom: 0.5rem; display: block;">Hoặc: Dán link Logo</label>
+                                <input type="text" id="qr-logo-url" class="tool-input" placeholder="https://...">
+                            </div>
+                        </div>
+
+                        <button onclick="generateQR()" class="tool-btn" style="width: 100%;">
+                            <i class="ph ph-magic-wand"></i> Xử lý & Tạo Mã QR
+                        </button>
+                    </div>
+
+                    <div style="margin-top: 2.5rem; text-align: center; border-top: 1px solid var(--border-color); padding-top: 2rem;">
+                        <div id="qrcode" style="display: inline-block; padding: 0; background: transparent; border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 1.5rem;"></div>
+                        
+                        <div id="download-section" style="display: none; justify-content: center;">
+                            <button onclick="downloadQR()" class="tool-btn" style="background: var(--success); width: auto; padding: 0.8rem 2rem;">
+                                <i class="ph ph-download-simple"></i> Tải ảnh QR xuống
+                            </button>
+                        </div>
+                        
+                        <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 1.5rem;">Click chuột phải hoặc nhấn giữ vào mã QR để lưu ảnh.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-scan" class="tab-content">
+                <div class="tool-container" style="max-width: 800px; text-align: center;">
+                    <h3 style="margin-bottom: 1.5rem;">Đọc dữ liệu từ Mã QR</h3>
+                    
+                    <div style="display: flex; gap: 1rem; justify-content: center; margin-bottom: 2rem; flex-wrap: wrap;">
+                        <button id="camera-btn" onclick="toggleCamera()" class="tool-btn" style="flex: 1; min-width: 200px;">
+                            <i class="ph ph-camera"></i> Mở Camera Quét
+                        </button>
+                        
+                        <div style="flex: 1; min-width: 200px; position: relative;">
+                            <input type="file" id="qr-upload-scan" accept="image/*" style="position: absolute; width: 100%; height: 100%; opacity: 0; cursor: pointer; z-index: 2;">
+                            <button class="tool-btn" style="width: 100%; background: var(--bg-surface-hover); color: var(--text-primary); border: 1px solid var(--border-color);">
+                                <i class="ph ph-image"></i> Tải ảnh có sẵn lên
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="reader" style="width: 100%; max-width: 500px; margin: 0 auto; border-radius: 12px; overflow: hidden; border: 2px dashed var(--border-color);"></div>
+                </div>
+            </div>
+
+        </main>
+    </div>
+    
+    <script src="script.js"></script>
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.currentTarget.classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            if (tabId === 'create' && isCameraOpen) {
+                toggleCamera();
+            }
+        }
+
+        // ==========================================
+        // 1. TẠO VÀ TẢI MÃ QR
+        // ==========================================
+        let qrcodeObj = null;
+
+        function generateQR() {
+            const inputVal = document.getElementById('qr-input').value.trim();
+            const logoFile = document.getElementById('qr-logo-file').files[0];
+            const logoUrl = document.getElementById('qr-logo-url').value.trim();
+            const container = document.getElementById('qrcode');
+            const downloadSection = document.getElementById('download-section');
+
+            if (!inputVal) {
+                Swal.fire('Lỗi', 'Vui lòng nhập nội dung cho mã QR!', 'error');
+                return;
+            }
+
+            container.innerHTML = ""; 
+            downloadSection.style.display = 'none'; // Ẩn nút tải đi trước khi tạo mới
+
+            let options = {
+                text: inputVal,
+                width: 300,
+                height: 300,
+                colorDark: "#000000",
+                colorLight: "#ffffff",
+                correctLevel: QRCode.CorrectLevel.H,
+                quietZone: 15,
+                quietZoneColor: "#ffffff",
+                dotScale: 1
+            };
+
+            const createWithLogo = (logoSrc) => {
+                if(logoSrc) {
+                    options.logo = logoSrc;
+                    options.logoWidth = 70;
+                    options.logoHeight = 70;
+                    options.logoBackgroundColor = '#ffffff'; 
+                    options.logoBackgroundTransparent = false;
+                }
+                
+                qrcodeObj = new QRCode(container, options);
+                
+                // Hiện nút tải xuống
+                setTimeout(() => {
+                    downloadSection.style.display = 'flex';
+                }, 200);
+                
+                if(logoSrc) {
+                    setTimeout(() => {
+                        const img = container.querySelector('img[src*="data:image"], img[src*="http"]'); 
+                        if(img) {
+                            img.style.borderRadius = "50%";
+                            img.style.objectFit = "cover";
+                            img.style.padding = "4px"; 
+                            img.style.backgroundColor = "#ffffff";
+                            img.style.boxSizing = "border-box";
+                        }
+                    }, 150);
+                }
+            };
+
+            if (logoFile) {
+                const reader = new FileReader();
+                reader.onload = (e) => createWithLogo(e.target.result);
+                reader.readAsDataURL(logoFile);
+            } else if (logoUrl) {
+                createWithLogo(logoUrl);
+            } else {
+                createWithLogo(null);
+            }
+        }
+
+        // Logic Tải mã QR
+        function downloadQR() {
+            const container = document.getElementById('qrcode');
+            const canvas = container.querySelector('canvas');
+            const img = container.querySelector('img');
+            let dataUrl = '';
+
+            // Lấy dữ liệu ảnh từ canvas hoặc thẻ img
+            if (canvas) {
+                dataUrl = canvas.toDataURL("image/png");
+            } else if (img && img.src.startsWith('data:image')) {
+                dataUrl = img.src;
+            } else {
+                Swal.fire('Lỗi', 'Không thể tải mã QR lúc này.', 'error');
+                return;
+            }
+
+            // Tạo thẻ a ảo để tải
+            const link = document.createElement('a');
+            link.href = dataUrl;
+            link.download = 'CICI_Media_QR_' + Date.now() + '.png';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // ==========================================
+        // 2. QUÉT MÃ QR
+        // ==========================================
+        const html5QrCode = new Html5Qrcode("reader");
+        let isCameraOpen = false;
+
+        function showScanResult(decodedText) {
+            if (isCameraOpen) toggleCamera();
+
+            Swal.fire({
+                title: 'Quét thành công!',
+                html: `<div style="background: var(--bg-body); padding: 1rem; border-radius: 8px; margin-top: 1rem; word-break: break-all; color: var(--accent); font-weight: bold; border: 1px solid var(--border-color);">${decodedText}</div>`,
+                icon: 'success',
+                showCancelButton: true,
+                confirmButtonText: '<i class="ph ph-copy"></i> Copy',
+                cancelButtonText: 'Đóng',
+                confirmButtonColor: 'var(--accent)',
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    navigator.clipboard.writeText(decodedText);
+                    Swal.fire({ title: 'Đã sao chép!', icon: 'success', timer: 1500, showConfirmButton: false });
+                }
+            });
+        }
+
+        const fileinput = document.getElementById('qr-upload-scan');
+        fileinput.addEventListener('change', e => {
+            if (e.target.files.length == 0) return;
+            const imageFile = e.target.files[0];
+            
+            html5QrCode.scanFile(imageFile, true)
+            .then(decodedText => {
+                showScanResult(decodedText);
+                fileinput.value = ""; 
+            })
+            .catch(err => {
+                Swal.fire('Thất bại', 'Không tìm thấy mã QR hợp lệ trong ảnh này.', 'error');
+                fileinput.value = "";
+            });
+        });
+
+        function toggleCamera() {
+            const btn = document.getElementById('camera-btn');
+            
+            if (isCameraOpen) {
+                html5QrCode.stop().then(() => {
+                    isCameraOpen = false;
+                    btn.innerHTML = '<i class="ph ph-camera"></i> Mở Camera Quét';
+                    btn.style.background = 'var(--accent)';
+                }).catch(err => console.log("Lỗi khi tắt camera", err));
+            } else {
+                Html5Qrcode.getCameras().then(devices => {
+                    if (devices && devices.length) {
+                        html5QrCode.start(
+                            { facingMode: "environment" },
+                            { fps: 10, qrbox: { width: 250, height: 250 } },
+                            (decodedText) => showScanResult(decodedText),
+                            (errorMessage) => {}
+                        ).then(() => {
+                            isCameraOpen = true;
+                            btn.innerHTML = '<i class="ph ph-x-circle"></i> Tắt Camera';
+                            btn.style.background = 'var(--danger)';
+                        });
+                    }
+                }).catch(err => {
+                    Swal.fire('Lỗi', 'Không thể truy cập Camera. Vui lòng kiểm tra quyền trên trình duyệt.', 'error');
+                });
+            }
+        }
+    </script>
+</body>
+</html>

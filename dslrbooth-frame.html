@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tạo Frame DSLRBooth | Cici Media</title>
+    <link rel="icon" type="image/png" href="logos/cicimedia.png?v=2">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Great+Vibes&family=Montserrat:wght@400;700&family=Playfair+Display:ital,wght@0,700;1,700&display=swap" rel="stylesheet">
+    <style>
+        .tool-layout { display: flex; gap: 2rem; flex-wrap: wrap; }
+        .controls-panel {
+            flex: 1; min-width: 320px; background: var(--bg-surface); padding: 1.5rem;
+            border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
+            display: flex; flex-direction: column; gap: 1.2rem;
+            max-height: 100vh; overflow-y: auto;
+        }
+        .preview-panel {
+            flex: 1.5; min-width: 320px; background: var(--bg-body); padding: 2rem;
+            border-radius: 16px; border: 1px solid var(--border-color);
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            box-shadow: var(--shadow); position: relative;
+            background-image: 
+                linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb), 
+                linear-gradient(45deg, #e5e7eb 25%, transparent 25%, transparent 75%, #e5e7eb 75%, #e5e7eb);
+            background-size: 20px 20px; background-position: 0 0, 10px 10px;
+        }
+        
+        #frame-canvas { max-width: 100%; max-height: 70vh; object-fit: contain; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border: 1px solid #ccc; cursor: grab; }
+        #frame-canvas:active { cursor: grabbing; }
+        #frame-canvas.draw-mode { cursor: crosshair; outline: 3px dashed var(--accent); outline-offset: 5px; }
+
+        .setting-group { margin-bottom: 0.5rem; }
+        .setting-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; }
+        .setting-group input, .setting-group select {
+            width: 100%; padding: 0.7rem; border-radius: 8px; border: 1px solid var(--border-color);
+            background: var(--bg-body); color: var(--text-primary); font-family: inherit; font-size: 0.9rem;
+        }
+
+        .upload-box {
+            border: 2px dashed var(--border-color); border-radius: 12px;
+            padding: 1.2rem 1rem; text-align: center; cursor: pointer;
+            transition: var(--transition); background: var(--bg-body); position: relative;
+        }
+        .upload-box:hover { border-color: var(--accent); background: var(--accent-light); }
+        .upload-box input[type="file"] { display: none; }
+        
+        .badge-count { position: absolute; top: -10px; right: -10px; background: var(--accent); color: white; font-weight: bold; font-size: 0.8rem; padding: 0.2rem 0.6rem; border-radius: 20px; display: none; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+
+        .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+        .btn-outline {
+            background: transparent; border: 2px solid var(--border-color); color: var(--text-primary);
+            padding: 0.6rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem;
+            transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
+        .btn-outline.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .btn-outline.success { border-color: #10b981; color: #10b981; }
+        .btn-outline.success:hover { background: rgba(16, 185, 129, 0.1); }
+
+        .layer-item {
+            background: var(--bg-body); border: 1px solid var(--border-color);
+            padding: 1rem; border-radius: 8px; margin-bottom: 0.8rem; position: relative;
+            transition: var(--transition); border-left: 4px solid transparent;
+        }
+        .layer-item.selected { border-left-color: var(--accent); background: var(--accent-light); }
+        .layer-item h4 { font-size: 0.85rem; margin-bottom: 0.5rem; color: var(--accent); cursor: pointer; }
+        .btn-remove-layer {
+            position: absolute; top: 10px; right: 10px; background: #ef4444; color: white;
+            border: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; font-size: 0.8rem;
+        }
+
+        .thumbnail-gallery { width: 100%; display: flex; gap: 0.8rem; overflow-x: auto; margin-top: 1.5rem; padding: 5px 5px 15px 5px; align-items: center; }
+        .thumbnail-gallery::-webkit-scrollbar { height: 6px; }
+        .thumbnail-gallery::-webkit-scrollbar-thumb { background: #555; border-radius: 10px; }
+        .thumb-wrapper { position: relative; width: 60px; height: 90px; flex-shrink: 0; border-radius: 6px; border: 2px solid transparent; transition: all 0.2s; background: #fff; }
+        .thumb-wrapper.active { border-color: var(--accent); box-shadow: 0 0 10px var(--accent-light); }
+        .thumb-img { width: 100%; height: 100%; object-fit: cover; border-radius: 4px; cursor: pointer; opacity: 0.5; transition: all 0.2s; }
+        .thumb-wrapper.active .thumb-img { opacity: 1; }
+        .thumb-wrapper:hover .thumb-img { opacity: 0.8; }
+        .thumb-del-btn { position: absolute; top: -8px; right: -8px; width: 20px; height: 20px; background: #ef4444; border-radius: 50%; color: white; display: none; align-items: center; justify-content: center; cursor: pointer; font-size: 0.75rem; font-weight: bold; z-index: 5; }
+        .thumb-wrapper:hover .thumb-del-btn { display: flex; }
+    </style>
+</head>
+<body>
+    <div class="app-layout">
+        <header class="mobile-header">
+            <div class="mobile-brand"><img src="logos/cicimedia.png" alt="Cici Media"></div>
+            <i class="ph ph-list menu-toggle" id="mobile-menu-btn"></i>
+        </header>
+        <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+        <aside class="sidebar" id="sidebar">
+            <div class="brand"><img src="logos/cicimedia.png" alt="Cici Media Logo" class="brand-logo"></div>
+            <nav class="menu">
+                <div class="menu-label">MENU CHÍNH</div>
+                <a href="index.html" class="menu-item"><i class="ph ph-squares-four"></i> Tổng quan</a>
+                <a href="exif-frame.html" class="menu-item"><i class="ph ph-camera"></i> Khung Ảnh EXIF</a>
+                <a href="watermark.html" class="menu-item"><i class="ph ph-image"></i> Chèn Watermark</a>
+                <a href="photo-editor.html" class="menu-item"><i class="ph ph-aperture"></i> Photo Editor</a>
+                <a href="dslrbooth-frame.html" class="menu-item active"><i class="ph ph-bounding-box"></i> Frame DSLRBooth</a>
+                <a href="qr-generator.html" class="menu-item"><i class="ph ph-qr-code"></i> Mã QR Tool</a>
+                <a href="typing-test.html" class="menu-item"><i class="ph ph-keyboard"></i> Typing Test</a>
+                <a href="lucky-draw.html" class="menu-item"><i class="ph ph-gift"></i> Vòng Quay & Bốc Thăm</a>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="#" class="menu-item" id="theme-toggle"><i class="ph ph-moon"></i> Đổi Giao Diện</a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="topbar" style="margin-bottom: 1.5rem;">
+                <div>
+                    <h1 class="page-title">DSLRBooth Frame Pro</h1>
+                    <p class="page-subtitle">Transform bằng chuột, Hệ thống Đa Layer Text & Nhận diện đục lỗ thông minh.</p>
+                </div>
+            </header>
+
+            <div class="tool-layout">
+                <div class="controls-panel">
+                    
+                    <div class="setting-group" style="background: var(--accent-light); padding: 1rem; border-radius: 12px; border: 1px dashed var(--accent);">
+                        <label style="color: var(--accent);"><i class="ph-bold ph-layout"></i> 1. Mẫu Frame (Templates)</label>
+                        <select id="template-select" onchange="loadTemplate()" style="border-color: var(--accent); margin-bottom: 0.5rem;">
+                            <option value="">-- Chọn Mẫu có sẵn hoặc Đã lưu --</option>
+                            <optgroup label="Mẫu Web Cung Cấp">
+                                <option value="preset_4x6_3">Khổ 4x6 inch - 3 Ảnh dọc</option>
+                                <option value="preset_4x6_4">Khổ 4x6 inch - 4 Ảnh chia vuông</option>
+                                <option value="preset_2x6_3">Dải 2x6 inch - 3 Ảnh ngang</option>
+                            </optgroup>
+                            <optgroup label="Mẫu Của Bạn" id="custom-templates-group"></optgroup>
+                        </select>
+                        <div style="display: flex; gap: 0.5rem;">
+                            <input type="text" id="custom-template-name" placeholder="Nhập tên để lưu mẫu..." style="flex: 1; border-color: var(--accent);">
+                            <button onclick="saveCustomTemplate()" class="btn-outline active" style="padding: 0 1rem; white-space: nowrap;">Lưu Mẫu</button>
+                        </div>
+                        <button onclick="downloadGuide()" class="btn-outline" style="width: 100%; margin-top: 0.5rem; background: var(--bg-surface);">
+                            <i class="ph-bold ph-download-simple"></i> Tải File Guide để thiết kế PTS
+                        </button>
+                    </div>
+
+                    <div class="setting-group">
+                        <label>2. Kích thước & Tải nền lên</label>
+                        <select id="canvas-size" onchange="changeGlobalSize()" style="margin-bottom: 0.8rem;">
+                            <option value="auto" selected>Tự động (Theo kích thước ảnh gốc)</option>
+                            <option value="1200x1800">4x6 inch (Portrait - 1200 x 1800 px)</option>
+                            <option value="1800x1200">6x4 inch (Landscape - 1800 x 1200 px)</option>
+                            <option value="600x1800">2x6 inch (Photo Strip - 600 x 1800 px)</option>
+                            <option value="1800x1800">1:1 Square (1800 x 1800 px)</option>
+                        </select>
+
+                        <div class="upload-box" onclick="document.getElementById('bg-upload').click()">
+                            <span class="badge-count" id="frame-count-badge">0</span>
+                            <i class="ph ph-images" style="font-size: 2rem; color: var(--accent);"></i>
+                            <p style="margin-top: 0.5rem; font-size: 0.9rem;" id="upload-text">Click tải thiết kế lên (Chọn nhiều file)</p>
+                            <input type="file" id="bg-upload" accept="image/png, image/jpeg" multiple>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 0.5rem;">
+                        <label style="font-weight: 600; font-size: 0.9rem; margin: 0;"><i class="ph-bold ph-text-t"></i> 3. Các Lớp Chữ (Text Layers)</label>
+                        <button onclick="addTextLayer()" style="background: var(--text-primary); color: var(--bg-surface); border: none; padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
+                            + Thêm Chữ
+                        </button>
+                    </div>
+                    <div id="texts-container" style="max-height: 250px; overflow-y: auto; padding-right: 5px;"></div>
+
+                    <div class="action-grid" style="margin-top: 1rem;">
+                        <button id="btn-draw-mode" class="btn-outline active" onclick="toggleMode('select')">
+                            <i class="ph-bold ph-cursor"></i> Kéo Thả (Bật)
+                        </button>
+                        <button id="btn-draw-mode-2" class="btn-outline" onclick="toggleMode('draw')">
+                            <i class="ph-bold ph-pencil-simple"></i> Vẽ Lỗ (Tắt)
+                        </button>
+                    </div>
+                    <button class="btn-outline success" onclick="autoDetectSlots()" style="width: 100%; margin-top: 0.5rem;">
+                        <i class="ph-bold ph-magic-wand"></i> Auto Tìm Lỗ (AI)
+                    </button>
+
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1rem;">
+                        <label style="font-weight: 600; font-size: 0.9rem; margin: 0;">4. Chi tiết Tọa độ Lỗ đục</label>
+                        <button onclick="addManualSlot()" style="background: var(--bg-body); color: var(--text-primary); border: 1px solid var(--border-color); padding: 0.3rem 0.6rem; border-radius: 6px; cursor: pointer; font-size: 0.8rem;">
+                            + Thêm Lỗ
+                        </button>
+                    </div>
+
+                    <div id="slots-container" style="max-height: 250px; overflow-y: auto; padding-right: 5px;"></div>
+
+                    <button id="export-btn" class="tool-btn" style="width: 100%; margin-top: 1.5rem;" onclick="exportFrames()">
+                        <i class="ph-bold ph-download-simple"></i> Xuất Frame Đục Lỗ PNG
+                    </button>
+                </div>
+
+                <div class="preview-panel">
+                    <div id="canvas-info" style="position: absolute; top: 1rem; left: 1rem; background: rgba(0,0,0,0.6); padding: 0.5rem 1rem; border-radius: 8px; color: white; font-size: 0.85rem; z-index: 10; display: none;">
+                        Độ phân giải: -- x --
+                    </div>
+                    
+                    <canvas id="frame-canvas"></canvas>
+                    <p id="draw-hint" style="margin-top: 1rem; font-size: 0.85rem; color: #10b981; font-weight: bold;">
+                        <i class="ph-fill ph-cursor"></i> Kéo thả trực tiếp chữ hoặc lỗ trên hình. Kéo góc phải dưới của lỗ để Resize.
+                    </p>
+                    <div id="thumbnail-list" class="thumbnail-gallery" style="display: none;"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        const canvas = document.getElementById('frame-canvas');
+        const ctx = canvas.getContext('2d');
+        const slotsContainer = document.getElementById('slots-container');
+        const textsContainer = document.getElementById('texts-container');
+        const thumbnailList = document.getElementById('thumbnail-list');
+        const canvasInfo = document.getElementById('canvas-info');
+        const drawHint = document.getElementById('draw-hint');
+
+        let canvasW = 1200;
+        let canvasH = 1800;
+        
+        let framesData = []; 
+        let currentIndex = 0;
+
+        // --- CÁC BIẾN CHO HỆ THỐNG MOUSE TRANSFORM ---
+        let appMode = 'select'; // 'select' hoặc 'draw'
+        
+        let activeObj = { type: null, id: null }; // Vật thể đang chọn
+        let isDragging = false;
+        let dragAction = null; // 'move', 'resize-br'
+        
+        let dragStartMouse = { x: 0, y: 0 };
+        let dragStartObj = null; // Lưu trạng thái gốc khi bắt đầu kéo
+        
+        let currentTempSlot = null; // Dùng khi vẽ lỗ mới
+
+        loadCustomTemplatesList();
+
+        // ==========================================
+        // 1. DATA & UI CƠ BẢN
+        // ==========================================
+        function ensureFrameExists() {
+            if (framesData.length === 0) {
+                const tempCanvas = document.createElement('canvas'); tempCanvas.width = canvasW; tempCanvas.height = canvasH;
+                const tCtx = tempCanvas.getContext('2d'); tCtx.fillStyle = '#ffffff'; tCtx.fillRect(0,0, canvasW, canvasH);
+                const img = new Image(); img.src = tempCanvas.toDataURL();
+                
+                framesData.push({ id: Date.now(), fileName: 'blank_template.png', origImg: img, slots: [], texts: [] });
+                currentIndex = 0; updateUI();
+            }
+        }
+
+        document.getElementById('bg-upload').addEventListener('change', async function(e) {
+            if(e.target.files.length > 0) {
+                const newFiles = Array.from(e.target.files);
+                Swal.fire({ title: 'Đang nạp ảnh...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+                for (let file of newFiles) {
+                    const img = await loadImage(file);
+                    if (framesData.length === 1 && framesData[0].fileName === 'blank_template.png') {
+                        const existingSlots = framesData[0].slots; const existingTexts = framesData[0].texts;
+                        framesData = [];
+                        framesData.push({ id: Date.now(), fileName: file.name, origImg: img, slots: existingSlots, texts: existingTexts });
+                    } else {
+                        framesData.push({ id: Date.now() + Math.random(), fileName: file.name, origImg: img, slots: [], texts: [] });
+                    }
+                }
+                Swal.close(); 
+                document.getElementById('canvas-size').value = 'auto';
+                updateUI(); selectFrame(framesData.length - newFiles.length);
+            }
+            this.value = ''; 
+        });
+
+        function loadImage(file) {
+            return new Promise((resolve) => {
+                const img = new Image(); img.onload = () => resolve(img); img.src = URL.createObjectURL(file);
+            });
+        }
+
+        function updateUI() {
+            const count = framesData.length;
+            const badge = document.getElementById('frame-count-badge');
+            const text = document.getElementById('upload-text');
+            const exportBtn = document.getElementById('export-btn');
+
+            if (count === 0 || (count === 1 && framesData[0].fileName === 'blank_template.png')) {
+                badge.style.display = 'none'; text.innerText = 'Click tải ảnh lên (chọn nhiều file)';
+                thumbnailList.style.display = 'none';
+                if(count === 0) renderPreview();
+                return;
+            }
+
+            badge.style.display = 'block'; badge.innerText = count; text.innerText = `Đã nạp ${count} thiết kế`;
+            exportBtn.innerHTML = count > 1 ? `<i class="ph-bold ph-file-zip"></i> Xuất ${count} Frames (Nén ZIP)` : `<i class="ph-bold ph-download-simple"></i> Xuất Frame đục lỗ PNG`;
+
+            thumbnailList.style.display = 'flex'; thumbnailList.innerHTML = '';
+            framesData.forEach((frame, index) => {
+                const wrapper = document.createElement('div'); wrapper.className = 'thumb-wrapper';
+                if(index === currentIndex) wrapper.classList.add('active');
+                const imgThumb = document.createElement('img'); imgThumb.className = 'thumb-img'; imgThumb.src = frame.origImg.src; 
+                const delBtn = document.createElement('div'); delBtn.className = 'thumb-del-btn'; delBtn.innerHTML = '<i class="ph-bold ph-x"></i>';
+                imgThumb.onclick = () => selectFrame(index);
+                delBtn.onclick = (e) => { e.stopPropagation(); removeFrame(index); };
+                wrapper.appendChild(imgThumb); wrapper.appendChild(delBtn); thumbnailList.appendChild(wrapper);
+            });
+            renderLayersUI();
+        }
+
+        function selectFrame(index) {
+            currentIndex = index; activeObj = { type: null, id: null };
+            document.querySelectorAll('.thumb-wrapper').forEach((el, i) => { el.classList.toggle('active', i === index); });
+            changeGlobalSize(); renderLayersUI(); renderPreview();
+        }
+
+        function removeFrame(index) {
+            framesData.splice(index, 1);
+            if (framesData.length > 0) {
+                if (currentIndex >= framesData.length) currentIndex = framesData.length - 1;
+                else if (index < currentIndex) currentIndex--;
+                updateUI(); selectFrame(currentIndex);
+            } else { updateUI(); renderPreview(); }
+        }
+
+        function changeGlobalSize() {
+            const val = document.getElementById('canvas-size').value;
+            if (val === 'auto') {
+                if (framesData.length > 0 && framesData[currentIndex].origImg && framesData[currentIndex].fileName !== 'blank_template.png') {
+                    canvasW = framesData[currentIndex].origImg.width; canvasH = framesData[currentIndex].origImg.height;
+                } else { canvasW = 1200; canvasH = 1800; }
+            } else {
+                const parts = val.split('x'); canvasW = parseInt(parts[0]); canvasH = parseInt(parts[1]);
+            }
+            renderPreview();
+        }
+
+        // ==========================================
+        // 2. LAYER CHỮ (TEXT LAYERS)
+        // ==========================================
+        function addTextLayer() {
+            ensureFrameExists();
+            const id = Date.now();
+            framesData[currentIndex].texts.push({
+                id: id, text: "Nhập chữ của bạn...", x: canvasW/2, y: canvasH/2, size: 80, font: "Montserrat", color: "#ffffff"
+            });
+            activeObj = { type: 'text', id: id };
+            renderLayersUI(); renderPreview();
+        }
+
+        function removeTextLayer(id) {
+            framesData[currentIndex].texts = framesData[currentIndex].texts.filter(t => t.id !== id);
+            if(activeObj.id === id) activeObj = { type: null, id: null };
+            renderLayersUI(); renderPreview();
+        }
+
+        function updateTextLayer(id, prop, value) {
+            const txt = framesData[currentIndex].texts.find(t => t.id === id);
+            if(txt) {
+                if(prop === 'size' || prop === 'x' || prop === 'y') txt[prop] = parseInt(value) || 0;
+                else txt[prop] = value;
+                renderPreview();
+            }
+        }
+
+        // ==========================================
+        // 3. LAYER LỖ (SLOTS)
+        // ==========================================
+        function addManualSlot() {
+            ensureFrameExists();
+            let newW = Math.round(canvasW * 0.5); let newH = Math.round(newW * 1.5);
+            const id = Date.now();
+            framesData[currentIndex].slots.push({ id: id, x: Math.round((canvasW - newW) / 2), y: Math.round((canvasH - newH) / 2), w: newW, h: newH, r: 0 });
+            activeObj = { type: 'slot', id: id };
+            renderLayersUI(); renderPreview();
+        }
+
+        function removeSlot(id) {
+            framesData[currentIndex].slots = framesData[currentIndex].slots.filter(s => s.id !== id);
+            if(activeObj.id === id) activeObj = { type: null, id: null };
+            renderLayersUI(); renderPreview();
+        }
+
+        function updateSlot(id, prop, value) {
+            const slot = framesData[currentIndex].slots.find(s => s.id === id);
+            if(slot) { slot[prop] = parseInt(value) || 0; renderPreview(); }
+        }
+
+        function autoDetectSlots() {
+            if (framesData.length === 0 || framesData[0].fileName === 'blank_template.png') return Swal.fire('Lỗi', 'Vui lòng tải ảnh thật lên trước', 'warning');
+            Swal.fire({ title: 'AI đang phân tích...', allowOutsideClick: false, didOpen: () => { Swal.showLoading(); }});
+
+            setTimeout(() => {
+                const currentFrame = framesData[currentIndex];
+                const tempCanvas = document.createElement('canvas'); tempCanvas.width = canvasW; tempCanvas.height = canvasH;
+                const tCtx = tempCanvas.getContext('2d', { willReadFrequently: true });
+                tCtx.drawImage(currentFrame.origImg, 0, 0, canvasW, canvasH);
+                const imageData = tCtx.getImageData(0, 0, canvasW, canvasH); const data = imageData.data;
+                const visited = new Uint8Array(canvasW * canvasH); let detectedSlots = 0;
+                
+                function isHole(x, y) {
+                    if (x < 0 || x >= canvasW || y < 0 || y >= canvasH) return false;
+                    const idx = (y * canvasW + x) * 4; const r = data[idx], g = data[idx+1], b = data[idx+2], a = data[idx+3];
+                    if (a > 100 && g > 90 && g > r * 1.2 && g > b * 1.2) return true;
+                    if (a < 30) return true; return false;
+                }
+                
+                for (let y = 0; y < canvasH; y += 2) { 
+                    for (let x = 0; x < canvasW; x += 2) {
+                        const pos = y * canvasW + x;
+                        if (!visited[pos] && isHole(x, y)) {
+                            let rw = 0; while (x + rw < canvasW && isHole(x + rw, y)) rw++;
+                            let rh = 0; while (y + rh < canvasH) {
+                                let matchCount = 0;
+                                for (let dx = 0; dx < rw; dx += Math.max(1, Math.floor(rw/10))) { if (isHole(x + dx, y + rh)) matchCount++; }
+                                if (matchCount > 3) rh++; else break;
+                            }
+                            for (let dy = 0; dy < rh; dy++) { for (let dx = 0; dx < rw; dx++) { visited[(y + dy) * canvasW + (x + dx)] = 1; } }
+                            if (rw > 50 && rh > 50 && (rw < canvasW * 0.95 || rh < canvasH * 0.95)) {
+                                currentFrame.slots.push({ id: Date.now() + Math.random(), x: x, y: y, w: rw, h: rh, r: 0 }); detectedSlots++;
+                            }
+                        }
+                    }
+                }
+                Swal.close();
+                if (detectedSlots > 0) Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: `Đã tìm thấy ${detectedSlots} lỗ!`, showConfirmButton: false, timer: 2500 });
+                else Swal.fire({ toast: true, position: 'top-end', icon: 'info', title: 'Không tìm thấy vùng đục lỗ.', showConfirmButton: false, timer: 2500 });
+                renderLayersUI(); renderPreview();
+            }, 100);
+        }
+
+        // Cập nhật giao diện Sidebar
+        function renderLayersUI() {
+            if (framesData.length === 0) return;
+            const frame = framesData[currentIndex];
+
+            // Render Text
+            textsContainer.innerHTML = '';
+            if(frame.texts.length === 0) textsContainer.innerHTML = '<p style="font-size: 0.85rem; color: #999; text-align: center; padding: 0.5rem;">Chưa có layer chữ.</p>';
+            frame.texts.forEach((txt, i) => {
+                const div = document.createElement('div');
+                div.className = `layer-item ${activeObj.type==='text' && activeObj.id===txt.id ? 'selected' : ''}`;
+                div.innerHTML = `
+                    <h4 onclick="setActiveObj('text', ${txt.id})">T Layer ${i+1}: ${txt.text.substring(0,10)}...</h4>
+                    <button class="btn-remove-layer" onclick="removeTextLayer(${txt.id})"><i class="ph-bold ph-x"></i></button>
+                    <input type="text" style="width:100%; padding:0.4rem; margin-bottom:0.5rem;" value="${txt.text}" oninput="updateTextLayer(${txt.id}, 'text', this.value)">
+                    <div style="display:grid; grid-template-columns: 1.5fr 1fr 1fr; gap:0.3rem; margin-bottom:0.5rem;">
+                        <select style="padding:0.2rem; font-size:0.8rem;" onchange="updateTextLayer(${txt.id}, 'font', this.value)">
+                            <option value="Montserrat" ${txt.font==='Montserrat'?'selected':''}>Hiện đại</option>
+                            <option value="Playfair Display" ${txt.font==='Playfair Display'?'selected':''}>Sang trọng</option>
+                            <option value="Great Vibes" ${txt.font==='Great Vibes'?'selected':''}>Chữ ký</option>
+                            <option value="Arial" ${txt.font==='Arial'?'selected':''}>Cơ bản</option>
+                        </select>
+                        <input type="color" style="padding:0; height:100%; width:100%;" value="${txt.color}" oninput="updateTextLayer(${txt.id}, 'color', this.value)">
+                        <div><small>Size</small><input type="number" style="width:100%; padding:0.2rem;" value="${txt.size}" oninput="updateTextLayer(${txt.id}, 'size', this.value)"></div>
+                    </div>
+                `;
+                textsContainer.appendChild(div);
+            });
+
+            // Render Slots
+            slotsContainer.innerHTML = '';
+            if(frame.slots.length === 0) slotsContainer.innerHTML = '<p style="font-size: 0.85rem; color: #999; text-align: center; padding: 1rem;">Chưa có lỗ nào.</p>';
+            frame.slots.forEach((slot, index) => {
+                const div = document.createElement('div');
+                div.className = `layer-item ${activeObj.type==='slot' && activeObj.id===slot.id ? 'selected' : ''}`;
+                div.innerHTML = `
+                    <h4 onclick="setActiveObj('slot', ${slot.id})"><i class="ph-fill ph-bounding-box"></i> Tọa độ lỗ ${index + 1}</h4>
+                    <button class="btn-remove-layer" onclick="removeSlot(${slot.id})"><i class="ph-bold ph-x"></i></button>
+                    <div style="display:grid; grid-template-columns: 1fr 1fr 1fr 1fr 1fr; gap:0.3rem;">
+                        <div><small>X</small><br><input type="number" style="width:100%; padding:0.4rem;" value="${Math.round(slot.x)}" oninput="updateSlot(${slot.id}, 'x', this.value)"></div>
+                        <div><small>Y</small><br><input type="number" style="width:100%; padding:0.4rem;" value="${Math.round(slot.y)}" oninput="updateSlot(${slot.id}, 'y', this.value)"></div>
+                        <div><small>W</small><br><input type="number" style="width:100%; padding:0.4rem;" value="${Math.round(slot.w)}" oninput="updateSlot(${slot.id}, 'w', this.value)"></div>
+                        <div><small>H</small><br><input type="number" style="width:100%; padding:0.4rem;" value="${Math.round(slot.h)}" oninput="updateSlot(${slot.id}, 'h', this.value)"></div>
+                        <div><small>Xoay°</small><br><input type="number" style="width:100%; padding:0.4rem;" value="${slot.r || 0}" oninput="updateSlot(${slot.id}, 'r', this.value)"></div>
+                    </div>
+                `;
+                slotsContainer.appendChild(div);
+            });
+        }
+
+        function setActiveObj(type, id) {
+            activeObj = { type, id };
+            renderLayersUI(); renderPreview();
+        }
+
+        // ==========================================
+        // 4. MOUSE TRANSFORM (ENGINE CANVAS)
+        // ==========================================
+        function toggleMode(mode) {
+            appMode = mode;
+            ensureFrameExists();
+            if (mode === 'draw') {
+                document.getElementById('btn-draw-mode-2').classList.add('active');
+                document.getElementById('btn-draw-mode').classList.remove('active');
+                canvas.classList.add('draw-mode'); drawHint.innerHTML = '<i class="ph-fill ph-pencil-simple"></i> Chế độ Vẽ Lỗ: Kéo thả chuột trên hình để khoét lỗ mới.';
+            } else {
+                document.getElementById('btn-draw-mode').classList.add('active');
+                document.getElementById('btn-draw-mode-2').classList.remove('active');
+                canvas.classList.remove('draw-mode'); drawHint.innerHTML = '<i class="ph-fill ph-cursor"></i> Chế độ Kéo Thả: Click chọn chữ hoặc lỗ để di chuyển. Kéo góc vuông để Resize.';
+            }
+            activeObj = { type: null, id: null }; renderLayersUI(); renderPreview();
+        }
+
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect(); const scaleX = canvas.width / rect.width; const scaleY = canvas.height / rect.height;
+            return { x: (evt.clientX - rect.left) * scaleX, y: (evt.clientY - rect.top) * scaleY };
+        }
+
+        // Kỹ thuật xoay tọa độ ngược để check hit detection
+        function isPointInRotatedRect(px, py, rx, ry, rw, rh, angleDeg) {
+            let cx = rx + rw/2, cy = ry + rh/2;
+            let angleRad = -(angleDeg || 0) * Math.PI / 180;
+            let tx = Math.cos(angleRad) * (px - cx) - Math.sin(angleRad) * (py - cy) + cx;
+            let ty = Math.sin(angleRad) * (px - cx) + Math.cos(angleRad) * (py - cy) + cy;
+            return (tx >= rx && tx <= rx + rw && ty >= ry && ty <= ry + rh);
+        }
+
+        // Tọa độ nút Resize
+        function getResizeHandleRect(slot) {
+            let cx = slot.x + slot.w/2, cy = slot.y + slot.h/2;
+            let angleRad = (slot.r || 0) * Math.PI / 180;
+            // Tọa độ góc Bottom-Right khi chưa xoay
+            let brX = slot.x + slot.w; let brY = slot.y + slot.h;
+            // Xoay tọa độ này theo tâm
+            let tx = Math.cos(angleRad) * (brX - cx) - Math.sin(angleRad) * (brY - cy) + cx;
+            let ty = Math.sin(angleRad) * (brX - cx) + Math.cos(angleRad) * (brY - cy) + cy;
+            // Trả về bounding box của cục Handle (40x40px)
+            return { x: tx - 20, y: ty - 20, w: 40, h: 40 };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (framesData.length === 0) return;
+            const pos = getMousePos(e);
+            const frame = framesData[currentIndex];
+
+            if (appMode === 'draw') {
+                isDrawing = true; startX = pos.x; startY = pos.y;
+                currentTempSlot = { x: startX, y: startY, w: 0, h: 0, r: 0 };
+                return;
+            }
+
+            if (appMode === 'select') {
+                // 1. Kiểm tra bấm vào nút Resize (chỉ kiểm tra vật đang active)
+                if (activeObj.type === 'slot') {
+                    const activeSlot = frame.slots.find(s => s.id === activeObj.id);
+                    if (activeSlot) {
+                        const hRect = getResizeHandleRect(activeSlot);
+                        if (pos.x >= hRect.x && pos.x <= hRect.x + hRect.w && pos.y >= hRect.y && pos.y <= hRect.y + hRect.h) {
+                            isDragging = true; dragAction = 'resize-br';
+                            dragStartMouse = { x: pos.x, y: pos.y };
+                            dragStartObj = { ...activeSlot }; // Lưu backup
+                            return; // Thoát để không check sang move
+                        }
+                    }
+                }
+
+                // 2. Quét click từ trên xuống dưới: Texts -> Slots
+                // Check Texts
+                for (let i = frame.texts.length - 1; i >= 0; i--) {
+                    const txt = frame.texts[i];
+                    ctx.font = `bold ${txt.size}px "${txt.font}", sans-serif`;
+                    const metrics = ctx.measureText(txt.text);
+                    const tW = metrics.width; const tH = txt.size;
+                    // Box của text (vì textBaseline='middle', textAlign='center')
+                    if (pos.x >= txt.x - tW/2 && pos.x <= txt.x + tW/2 && pos.y >= txt.y - tH/2 && pos.y <= txt.y + tH/2) {
+                        activeObj = { type: 'text', id: txt.id };
+                        isDragging = true; dragAction = 'move';
+                        dragStartMouse = { x: pos.x, y: pos.y }; dragStartObj = { ...txt };
+                        renderLayersUI(); renderPreview(); return;
+                    }
+                }
+
+                // Check Slots (Tính cả xoay)
+                for (let i = frame.slots.length - 1; i >= 0; i--) {
+                    const slot = frame.slots[i];
+                    if (isPointInRotatedRect(pos.x, pos.y, slot.x, slot.y, slot.w, slot.h, slot.r)) {
+                        activeObj = { type: 'slot', id: slot.id };
+                        isDragging = true; dragAction = 'move';
+                        dragStartMouse = { x: pos.x, y: pos.y }; dragStartObj = { ...slot };
+                        renderLayersUI(); renderPreview(); return;
+                    }
+                }
+
+                // Click ra ngoài
+                activeObj = { type: null, id: null };
+                renderLayersUI(); renderPreview();
+            }
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            const pos = getMousePos(e);
+            
+            // Vẽ lỗ mới
+            if (appMode === 'draw' && isDrawing && currentTempSlot) {
+                currentTempSlot.w = pos.x - startX; currentTempSlot.h = pos.y - startY; renderPreview(); return;
+            }
+
+            // Kéo thả & Resize
+            if (appMode === 'select' && isDragging) {
+                const frame = framesData[currentIndex];
+                const dx = pos.x - dragStartMouse.x;
+                const dy = pos.y - dragStartMouse.y;
+
+                if (activeObj.type === 'text' && dragAction === 'move') {
+                    const txt = frame.texts.find(t => t.id === activeObj.id);
+                    if(txt) { txt.x = dragStartObj.x + dx; txt.y = dragStartObj.y + dy; renderPreview(); }
+                } 
+                else if (activeObj.type === 'slot') {
+                    const slot = frame.slots.find(s => s.id === activeObj.id);
+                    if(!slot) return;
+                    if (dragAction === 'move') {
+                        slot.x = dragStartObj.x + dx; slot.y = dragStartObj.y + dy;
+                    } else if (dragAction === 'resize-br') {
+                        // Math đơn giản cho Resize khi kéo (không hoàn hảo nếu có rotation, nhưng đủ dùng)
+                        let newW = dragStartObj.w + dx; let newH = dragStartObj.h + dy;
+                        if(newW > 20) slot.w = newW;
+                        if(newH > 20) slot.h = newH;
+                    }
+                    renderPreview();
+                }
+            }
+        });
+
+        canvas.addEventListener('mouseup', () => {
+            if (appMode === 'draw' && isDrawing && currentTempSlot) {
+                isDrawing = false;
+                if (currentTempSlot.w < 0) { currentTempSlot.x += currentTempSlot.w; currentTempSlot.w = Math.abs(currentTempSlot.w); }
+                if (currentTempSlot.h < 0) { currentTempSlot.y += currentTempSlot.h; currentTempSlot.h = Math.abs(currentTempSlot.h); }
+                if (currentTempSlot.w > 20 && currentTempSlot.h > 20) {
+                    framesData[currentIndex].slots.push({ id: Date.now(), x: currentTempSlot.x, y: currentTempSlot.y, w: currentTempSlot.w, h: currentTempSlot.h, r: 0 });
+                }
+                currentTempSlot = null; renderLayersUI(); renderPreview();
+            }
+            if (appMode === 'select' && isDragging) {
+                isDragging = false; dragAction = null; renderLayersUI(); // Update thông số ra khung input
+            }
+        });
+
+        // Touch support ...
+        canvas.addEventListener('touchstart', (e) => { if(e.touches.length > 0) { e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; canvas.dispatchEvent(new MouseEvent('mousedown', e)); } }, {passive: false});
+        canvas.addEventListener('touchmove', (e) => { if(isDrawing || isDragging) { e.preventDefault(); e.clientX = e.touches[0].clientX; e.clientY = e.touches[0].clientY; canvas.dispatchEvent(new MouseEvent('mousemove', e)); } }, {passive: false});
+        canvas.addEventListener('touchend', (e) => { canvas.dispatchEvent(new MouseEvent('mouseup', e)); });
+
+
+        // ==========================================
+        // 5. RENDER CANVAS ĐỈNH CAO
+        // ==========================================
+        function renderPreview() {
+            canvas.width = canvasW; canvas.height = canvasH;
+            if(canvasW > 0 && canvasH > 0) {
+                canvasInfo.style.display = 'block'; canvasInfo.innerText = `Kích thước: ${canvasW} x ${canvasH} px`;
+            }
+
+            if (framesData.length === 0) { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvasW, canvasH); return; }
+            const currentFrame = framesData[currentIndex];
+            
+            if (currentFrame.fileName === 'blank_template.png') { ctx.fillStyle = '#ffffff'; ctx.fillRect(0, 0, canvasW, canvasH); } 
+            else { ctx.drawImage(currentFrame.origImg, 0, 0, canvasW, canvasH); }
+
+            // Vẽ Chữ
+            currentFrame.texts.forEach(txt => {
+                ctx.save();
+                ctx.fillStyle = txt.color; ctx.font = `bold ${txt.size}px "${txt.font}", sans-serif`;
+                ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.fillText(txt.text, txt.x, txt.y);
+                
+                // Highlight nếu active
+                if(activeObj.type === 'text' && activeObj.id === txt.id) {
+                    const metrics = ctx.measureText(txt.text);
+                    ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 4; ctx.setLineDash([10, 5]);
+                    ctx.strokeRect(txt.x - metrics.width/2 - 10, txt.y - txt.size/2 - 10, metrics.width + 20, txt.size + 20);
+                }
+                ctx.restore();
+            });
+
+            // Vẽ Lỗ đục & Highlight
+            currentFrame.slots.forEach((slot, i) => {
+                ctx.save();
+                ctx.translate(slot.x + slot.w/2, slot.y + slot.h/2);
+                ctx.rotate((slot.r || 0) * Math.PI / 180);
+
+                ctx.fillStyle = 'rgba(239, 68, 68, 0.35)'; ctx.fillRect(-slot.w/2, -slot.h/2, slot.w, slot.h);
+                
+                if (activeObj.type === 'slot' && activeObj.id === slot.id) {
+                    // Viền active
+                    ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 6; ctx.setLineDash([15, 10]); ctx.strokeRect(-slot.w/2, -slot.h/2, slot.w, slot.h);
+                    // Handle Resize (Góc phải dưới)
+                    ctx.fillStyle = '#0ea5e9'; ctx.fillRect(slot.w/2 - 20, slot.h/2 - 20, 40, 40);
+                    ctx.strokeStyle = '#fff'; ctx.lineWidth = 4; ctx.setLineDash([]); ctx.strokeRect(slot.w/2 - 20, slot.h/2 - 20, 40, 40);
+                } else {
+                    ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 4; ctx.setLineDash([15, 10]); ctx.strokeRect(-slot.w/2, -slot.h/2, slot.w, slot.h);
+                }
+                
+                ctx.setLineDash([]); ctx.fillStyle = '#fff'; ctx.font = 'bold 50px sans-serif'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(0,0,0,0.8)'; ctx.shadowBlur = 10; ctx.fillText(`Lỗ ${i+1}`, 0, 0); ctx.shadowBlur = 0;
+                ctx.restore();
+            });
+
+            if (currentTempSlot) {
+                ctx.fillStyle = 'rgba(14, 165, 233, 0.4)'; ctx.fillRect(currentTempSlot.x, currentTempSlot.y, currentTempSlot.w, currentTempSlot.h);
+                ctx.strokeStyle = '#0ea5e9'; ctx.lineWidth = 4; ctx.setLineDash([10, 5]); ctx.strokeRect(currentTempSlot.x, currentTempSlot.y, currentTempSlot.w, currentTempSlot.h);
+            }
+        }
+
+        // ==========================================
+        // 6. XUẤT PNG ĐỤC LỖ & TEMPLATE
+        // ==========================================
+        function saveCustomTemplate() {
+            const nameInput = document.getElementById('custom-template-name').value.trim();
+            if (!nameInput) return Swal.fire('Lỗi', 'Vui lòng nhập Tên Template', 'warning');
+            if (framesData.length === 0) return;
+            
+            const savedStr = localStorage.getItem('cici_dslr_custom_templates');
+            let templates = savedStr ? JSON.parse(savedStr) : [];
+            
+            const idx = templates.findIndex(t => t.name === nameInput);
+            const newTpl = {
+                name: nameInput, sizeVal: document.getElementById('canvas-size').value,
+                slots: framesData[currentIndex].slots, texts: framesData[currentIndex].texts
+            };
+
+            if (idx >= 0) templates[idx] = newTpl; else templates.push(newTpl);
+            localStorage.setItem('cici_dslr_custom_templates', JSON.stringify(templates));
+            loadCustomTemplatesList(); 
+            document.getElementById('template-select').value = 'custom_' + nameInput;
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã lưu Template!', showConfirmButton: false, timer: 2000 });
+        }
+
+        function loadTemplate() {
+            const val = document.getElementById('template-select').value;
+            if (!val) return;
+            ensureFrameExists(); const frame = framesData[currentIndex];
+            frame.slots = []; frame.texts = [];
+
+            if (val === 'preset_4x6_3') {
+                document.getElementById('canvas-size').value = '1200x1800'; changeGlobalSize();
+                frame.slots.push({ id: 1, x: 180, y: 30, w: 840, h: 560, r: 0 }); frame.slots.push({ id: 2, x: 180, y: 620, w: 840, h: 560, r: 0 }); frame.slots.push({ id: 3, x: 180, y: 1210, w: 840, h: 560, r: 0 });
+            } 
+            else if (val === 'preset_4x6_4') {
+                document.getElementById('canvas-size').value = '1200x1800'; changeGlobalSize();
+                frame.slots.push({ id: 1, x: 50, y: 50, w: 525, h: 525, r: 0 }); frame.slots.push({ id: 2, x: 625, y: 50, w: 525, h: 525, r: 0 }); frame.slots.push({ id: 3, x: 50, y: 625, w: 525, h: 525, r: 0 }); frame.slots.push({ id: 4, x: 625, y: 625, w: 525, h: 525, r: 0 });
+            }
+            else if (val === 'preset_2x6_3') {
+                document.getElementById('canvas-size').value = '600x1800'; changeGlobalSize();
+                frame.slots.push({ id: 1, x: 50, y: 50, w: 500, h: 400, r: 0 }); frame.slots.push({ id: 2, x: 50, y: 480, w: 500, h: 400, r: 0 }); frame.slots.push({ id: 3, x: 50, y: 910, w: 500, h: 400, r: 0 });
+            }
+            else if (val.startsWith('custom_')) {
+                const name = val.replace('custom_', '');
+                const savedStr = localStorage.getItem('cici_dslr_custom_templates');
+                const templates = savedStr ? JSON.parse(savedStr) : [];
+                const tData = templates.find(t => t.name === name);
+                if (tData) {
+                    document.getElementById('canvas-size').value = tData.sizeVal; changeGlobalSize();
+                    frame.slots = tData.slots.map(s => ({...s, id: Date.now() + Math.random()}));
+                    frame.texts = tData.texts ? tData.texts.map(t => ({...t, id: Date.now() + Math.random()})) : [];
+                }
+            }
+            activeObj = { type: null, id: null }; renderLayersUI(); renderPreview();
+            Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã áp dụng Template!', showConfirmButton: false, timer: 1500 });
+        }
+
+        function downloadGuide() {
+            if (framesData.length === 0 || framesData[currentIndex].slots.length === 0) return Swal.fire('Lỗi', 'Vui lòng tạo lỗ đục trước khi tải Guide', 'warning');
+            const tempCanvas = document.createElement('canvas'); tempCanvas.width = canvasW; tempCanvas.height = canvasH; const tCtx = tempCanvas.getContext('2d');
+            tCtx.fillStyle = '#f0f0f0'; tCtx.fillRect(0,0, canvasW, canvasH);
+            
+            framesData[currentIndex].slots.forEach((slot, i) => {
+                tCtx.save(); tCtx.translate(slot.x + slot.w/2, slot.y + slot.h/2); tCtx.rotate((slot.r || 0) * Math.PI / 180);
+                tCtx.fillStyle = '#cccccc'; tCtx.fillRect(-slot.w/2, -slot.h/2, slot.w, slot.h);
+                tCtx.strokeStyle = '#666666'; tCtx.lineWidth = 2; tCtx.strokeRect(-slot.w/2, -slot.h/2, slot.w, slot.h);
+                tCtx.fillStyle = '#333'; tCtx.font = 'bold 40px sans-serif'; tCtx.textAlign = 'center'; tCtx.textBaseline = 'middle';
+                tCtx.fillText(`VÙNG ẢNH ${i+1}`, 0, -20); tCtx.font = '24px sans-serif'; tCtx.fillText(`${slot.w} x ${slot.h}`, 0, 30); tCtx.restore();
+            });
+
+            const link = document.createElement('a'); link.href = tempCanvas.toDataURL('image/png'); link.download = `Guide_Template_${canvasW}x${canvasH}.png`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+        }
+
+        async function exportFrames() {
+            const exportData = framesData.filter(f => f.fileName !== 'blank_template.png');
+            if (exportData.length === 0) return Swal.fire('Lỗi', 'Vui lòng tải ảnh lên để xuất!', 'warning');
+
+            if (exportData.length === 1) {
+                const blob = await processSingleFrame(exportData[0]);
+                const link = document.createElement('a'); link.href = URL.createObjectURL(blob);
+                link.download = `Cici_Frame_${exportData[0].fileName.split('.')[0]}.png`;
+                document.body.appendChild(link); link.click(); document.body.removeChild(link);
+                Swal.fire({ toast: true, position: 'top-end', icon: 'success', title: 'Đã lưu Frame PNG!', showConfirmButton: false, timer: 2000 });
+                return;
+            }
+
+            const zip = new JSZip(); let processedCount = 0;
+            Swal.fire({ title: 'Đang xuất hàng loạt...', html: `Đã xử lý: <b>0</b> / ${exportData.length}`, allowOutsideClick: false, didOpen: () => { Swal.showLoading(); } });
+
+            for (let i = 0; i < exportData.length; i++) {
+                const blob = await processSingleFrame(exportData[i]);
+                zip.file(`Cici_Frame_${i+1}_${exportData[i].fileName.split('.')[0]}.png`, blob);
+                processedCount++; Swal.getHtmlContainer().querySelector('b').textContent = processedCount;
+            }
+            
+            const zipContent = await zip.generateAsync({ type: "blob" });
+            const link = document.createElement('a'); link.href = URL.createObjectURL(zipContent);
+            link.download = `Cici_DSLRBooth_Frames_${Date.now()}.zip`;
+            document.body.appendChild(link); link.click(); document.body.removeChild(link);
+            Swal.fire('Thành công!', `Đã xuất ${exportData.length} file PNG trong suốt.`, 'success');
+        }
+
+        function processSingleFrame(frame) {
+            return new Promise((resolve) => {
+                const tempCanvas = document.createElement('canvas'); tempCanvas.width = canvasW; tempCanvas.height = canvasH; const tCtx = tempCanvas.getContext('2d');
+                tCtx.drawImage(frame.origImg, 0, 0, canvasW, canvasH);
+                
+                // Vẽ chữ layer
+                frame.texts.forEach(txt => {
+                    tCtx.save(); tCtx.fillStyle = txt.color; tCtx.font = `bold ${txt.size}px "${txt.font}", sans-serif`;
+                    tCtx.textAlign = 'center'; tCtx.textBaseline = 'middle'; tCtx.fillText(txt.text, txt.x, txt.y); tCtx.restore();
+                });
+
+                // Đục lỗ
+                if (frame.slots.length > 0) {
+                    tCtx.globalCompositeOperation = 'destination-out'; tCtx.fillStyle = '#000';
+                    frame.slots.forEach(slot => {
+                        tCtx.save(); tCtx.translate(slot.x + slot.w/2, slot.y + slot.h/2); tCtx.rotate((slot.r || 0) * Math.PI / 180);
+                        tCtx.fillRect(-slot.w/2, -slot.h/2, slot.w, slot.h); tCtx.restore();
+                    });
+                }
+                tempCanvas.toBlob((blob) => { resolve(blob); }, 'image/png');
+            });
+        }
+        changeGlobalSize();
+    </script>
+</body>
+</html>
