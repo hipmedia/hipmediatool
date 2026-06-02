@@ -669,7 +669,7 @@
                 const dataUrl = tempCanvas.toDataURL('image/jpeg', 1.0);
                 const link = document.createElement('a');
                 link.href = dataUrl;
-                link.download = 'HIP_Watermark_' + selectedFiles[0].name;
+                link.download = 'CICI_Watermark_' + selectedFiles[0].name;
                 document.body.appendChild(link);
                 link.click();
                 document.body.removeChild(link);
@@ -690,7 +690,7 @@
             for (let i = 0; i < selectedFiles.length; i++) {
                 const file = selectedFiles[i];
                 const blob = await processSingleFile(file);
-                zip.file(`HIP_${file.name}`, blob);
+                zip.file(`CICI_${file.name}`, blob);
                 
                 processedCount++;
                 Swal.getHtmlContainer().querySelector('b').textContent = processedCount;
@@ -702,7 +702,7 @@
             
             const link = document.createElement('a');
             link.href = URL.createObjectURL(zipContent);
-            link.download = `HIP_Watermarks_${Date.now()}.zip`;
+            link.download = `CICIMEDIA_Watermarks_${Date.now()}.zip`;
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
