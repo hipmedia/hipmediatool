@@ -3,40 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chụp Photobooth | Cici Media</title>
-    <link rel="icon" type="image/png" href="logos/cicimedia.png">
+    <title>Chụp Photobooth 4 Ảnh | Cici Media</title>
+    <link rel="icon" type="image/png" href="logos/cicimedia.png?v=2">
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         .tool-layout { display: flex; gap: 2rem; flex-wrap: wrap; }
         
-        /* Khu vực Camera */
+        /* CỘT TRÁI: CAMERA TƯƠNG TÁC */
         .camera-panel {
-            flex: 2; min-width: 320px; background: var(--bg-surface); padding: 1.5rem;
+            flex: 1.5; min-width: 320px; background: var(--bg-surface); padding: 1.5rem;
             border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
-            display: flex; flex-direction: column; align-items: center; position: relative;
+            display: flex; flex-direction: column; position: relative;
         }
 
         .booth-screen {
-            position: relative; width: 100%; max-width: 800px; aspect-ratio: 4/3; 
+            position: relative; width: 100%; aspect-ratio: 4/3; 
             background: #000; border-radius: 12px; overflow: hidden;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
         }
 
-        #booth-video {
-            width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); /* Lật gương camera */
-        }
-
-        #booth-overlay {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            object-fit: fill; pointer-events: none; z-index: 10;
-        }
+        #booth-video { width: 100%; height: 100%; object-fit: cover; transform: scaleX(-1); }
 
         #countdown-display {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
             font-size: 8rem; font-weight: 800; color: white; text-shadow: 0 4px 20px rgba(0,0,0,0.8);
-            z-index: 20; display: none;
+            z-index: 20; display: none; margin: 0; line-height: 1;
+        }
+
+        #status-display {
+            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
+            background: rgba(239, 68, 68, 0.9); color: white; padding: 8px 20px;
+            border-radius: 20px; font-weight: bold; font-size: 1.2rem; z-index: 20; display: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); letter-spacing: 1px;
         }
 
         #flash-effect {
@@ -46,57 +46,61 @@
         }
         #flash-effect.flash { opacity: 1; }
 
-        /* Khu vực Bảng điều khiển */
+        /* CỘT PHẢI: BẢNG ĐIỀU KHIỂN & KẾT QUẢ */
         .controls-panel {
-            flex: 1; min-width: 300px; background: var(--bg-surface); padding: 1.5rem;
+            flex: 1; min-width: 320px; background: var(--bg-surface); padding: 1.5rem;
             border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
             display: flex; flex-direction: column; gap: 1.2rem;
         }
 
         .setting-group { margin-bottom: 0.5rem; }
-        .setting-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; color: var(--text-primary); }
+        .setting-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; }
         .prop-input {
             width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border-color);
             background: var(--bg-body); color: var(--text-primary); font-family: inherit; font-size: 0.9rem;
         }
 
-        .upload-box {
-            border: 2px dashed var(--border-color); border-radius: 12px;
-            padding: 1.2rem; text-align: center; cursor: pointer;
-            transition: var(--transition); background: var(--bg-body);
+        .toggle-recap {
+            display: flex; align-items: center; gap: 0.8rem; background: var(--bg-body);
+            padding: 1rem; border-radius: 8px; border: 1px solid var(--border-color); cursor: pointer;
         }
-        .upload-box:hover { border-color: var(--accent); background: var(--accent-light); }
-        .upload-box input[type="file"] { display: none; }
+        .toggle-recap input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
+        .toggle-recap span { font-weight: 600; font-size: 0.95rem; }
 
         .btn-capture {
             background: #ef4444; color: white; border: none; padding: 1.2rem;
-            border-radius: 12px; font-weight: 700; font-size: 1.2rem; cursor: pointer;
+            border-radius: 12px; font-weight: 700; font-size: 1.3rem; cursor: pointer;
             display: flex; align-items: center; justify-content: center; gap: 0.5rem;
             transition: var(--transition); text-transform: uppercase; letter-spacing: 1px;
-            margin-top: auto; box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3);
+            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.3); margin-top: 1rem;
         }
         .btn-capture:hover { background: #dc2626; transform: translateY(-3px); box-shadow: 0 15px 25px rgba(239, 68, 68, 0.4); }
-        .btn-capture:active { transform: translateY(0); }
         .btn-capture:disabled { background: #9ca3af; box-shadow: none; cursor: not-allowed; transform: none; }
 
-        .btn-outline {
-            background: transparent; border: 1px solid var(--border-color); color: var(--text-primary);
-            padding: 0.8rem; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.85rem;
-            width: 100%; transition: var(--transition); display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        /* KHU VỰC KẾT QUẢ SAU CHỤP */
+        .result-section {
+            display: none; flex-direction: column; gap: 1rem; margin-top: 1.5rem;
+            padding-top: 1.5rem; border-top: 2px dashed var(--border-color);
         }
-        .btn-outline:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
-
-        #gallery {
-            display: flex; gap: 0.8rem; overflow-x: auto; margin-top: 1rem; padding-bottom: 0.5rem;
-            width: 100%; max-width: 800px;
+        .result-preview-box {
+            width: 100%; background: var(--bg-body); border-radius: 12px;
+            padding: 1rem; text-align: center; border: 1px solid var(--border-color);
         }
-        #gallery::-webkit-scrollbar { height: 6px; }
-        #gallery::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
-        .gallery-item {
-            width: 120px; height: 90px; border-radius: 8px; border: 2px solid var(--border-color);
-            object-fit: cover; flex-shrink: 0; cursor: pointer; transition: 0.2s;
+        #final-result-img { max-width: 100%; height: auto; border-radius: 8px; box-shadow: var(--shadow); }
+        
+        .upload-frame-btn {
+            background: var(--bg-surface-hover); color: var(--accent); border: 2px dashed var(--accent);
+            padding: 1rem; border-radius: 10px; font-weight: 600; cursor: pointer;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem; transition: 0.2s;
         }
-        .gallery-item:hover { border-color: var(--accent); transform: scale(1.05); }
+        .upload-frame-btn:hover { background: var(--accent-light); }
+        
+        .download-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
+        .btn-dl { padding: 1rem; border-radius: 10px; font-weight: bold; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-size: 0.9rem; transition: 0.2s; color: white;}
+        .btn-dl-photo { background: var(--accent); }
+        .btn-dl-photo:hover { background: #0284c7; }
+        .btn-dl-video { background: #10b981; }
+        .btn-dl-video:hover { background: #059669; }
 
     </style>
 </head>
@@ -115,9 +119,10 @@
                 <a href="index.html" class="menu-item"><i class="ph ph-squares-four"></i> Tổng quan</a>
                 <a href="exif-frame.html" class="menu-item"><i class="ph ph-camera"></i> Khung Ảnh EXIF</a>
                 <a href="photobooth.html" class="menu-item active"><i class="ph ph-camera-rotate"></i> Chụp Photobooth</a>
-                <a href="shutter-check.html" class="menu-item"><i class="ph ph-shutter"></i> Kiểm tra Số Shot</a>
                 <a href="watermark.html" class="menu-item"><i class="ph ph-image"></i> Chèn Watermark</a>
+                <a href="photo-editor.html" class="menu-item"><i class="ph ph-aperture"></i> Photo Editor</a>
                 <a href="dslrbooth-frame.html" class="menu-item"><i class="ph ph-bounding-box"></i> Frame DSLRBooth</a>
+                <a href="qr-generator.html" class="menu-item"><i class="ph ph-qr-code"></i> Mã QR Tool</a>
             </nav>
             <div class="sidebar-footer">
                 <a href="#" class="menu-item" id="theme-toggle"><i class="ph ph-moon"></i> Đổi Giao Diện</a>
@@ -127,87 +132,101 @@
         <main class="main-content">
             <header class="topbar" style="margin-bottom: 1.5rem;">
                 <div>
-                    <h1 class="page-title">Live Photobooth</h1>
-                    <p class="page-subtitle">Tích hợp khung overlay, đếm ngược và chụp trực tiếp từ Webcam.</p>
+                    <h1 class="page-title">Live Photobooth (4 Shots)</h1>
+                    <p class="page-subtitle">Tự động chụp 4 ảnh liên tiếp, quay Video Recap và ghép Frame trực tiếp trên web.</p>
                 </div>
             </header>
 
             <div class="tool-layout">
                 <div class="camera-panel">
-                    <div class="booth-screen" id="booth-screen">
-                        <video id="booth-video" autoplay playsinline></video>
-                        <img id="booth-overlay" src="" style="display: none;">
-                        <div id="countdown-display">3</div>
+                    <div class="booth-screen">
+                        <video id="booth-video" autoplay playsinline muted></video>
+                        <div id="status-display">ẢNH 1/4</div>
+                        <p id="countdown-display">3</p>
                         <div id="flash-effect"></div>
                     </div>
-                    
-                    <div style="width: 100%; text-align: left; margin-top: 1rem; color: var(--text-secondary); font-size: 0.85rem;">
-                        <i class="ph-fill ph-images"></i> <b>Ảnh đã chụp gần đây:</b>
-                    </div>
-                    <div id="gallery"></div>
+                    <p style="text-align: center; font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem;">
+                        <i class="ph-fill ph-lightbulb"></i> Máy sẽ tự động chụp 4 lần. Hãy đổi dáng sau mỗi lần chớp Flash!
+                    </p>
                 </div>
 
                 <div class="controls-panel">
-                    
                     <div class="setting-group">
-                        <label><i class="ph-bold ph-video-camera"></i> 1. Chọn Camera</label>
+                        <label><i class="ph-bold ph-video-camera"></i> Nguồn Camera</label>
                         <select id="camera-select" class="prop-input" onchange="startCamera()"></select>
                     </div>
 
-                    <div class="setting-group" style="margin-top: 1rem;">
-                        <label><i class="ph-bold ph-layout"></i> 2. Khung Overlay (PNG Trong Suốt)</label>
-                        <div class="upload-box" onclick="document.getElementById('frame-upload').click()">
-                            <i class="ph-bold ph-upload-simple" style="font-size: 1.8rem; color: var(--accent);"></i>
-                            <p style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--text-secondary);" id="frame-name">Click để tải khung đục lỗ lên</p>
-                            <input type="file" id="frame-upload" accept="image/png">
-                        </div>
-                        <button class="btn-outline" style="margin-top: 0.5rem;" onclick="clearFrame()">
-                            <i class="ph-bold ph-trash"></i> Bỏ khung hiện tại
-                        </button>
-                    </div>
+                    <label class="toggle-recap">
+                        <input type="checkbox" id="record-recap" checked>
+                        <span><i class="ph-fill ph-video-camera"></i> Tự động quay Video Recap</span>
+                    </label>
 
-                    <div class="setting-group" style="margin-top: 1rem;">
-                        <label><i class="ph-bold ph-timer"></i> 3. Đếm ngược (Countdown)</label>
-                        <select id="timer-select" class="prop-input">
-                            <option value="3">3 giây</option>
-                            <option value="5">5 giây</option>
-                            <option value="0">Chụp liền (Không đếm)</option>
-                        </select>
-                    </div>
-
-                    <button class="btn-capture" id="btn-capture" onclick="startCapture()">
-                        <i class="ph-fill ph-camera"></i> CHỤP ẢNH
+                    <button class="btn-capture" id="btn-capture" onclick="startPhotoSession()">
+                        <i class="ph-fill ph-camera"></i> BẮT ĐẦU CHỤP
                     </button>
-                    <p style="text-align: center; font-size: 0.8rem; color: var(--text-secondary); margin-top: 0.5rem;">Có thể bấm <b>Phím Space</b> để chụp</p>
+
+                    <div class="result-section" id="result-section">
+                        <h3 style="font-size: 1.1rem; color: var(--accent); text-align: center;"><i class="ph-fill ph-check-circle"></i> ĐÃ CHỤP XONG!</h3>
+                        
+                        <div class="result-preview-box">
+                            <img id="final-result-img" src="" alt="Photobooth Result">
+                        </div>
+
+                        <label class="upload-frame-btn" onclick="document.getElementById('frame-upload').click()">
+                            <i class="ph-bold ph-frame-corners"></i> Chọn Frame Áp Vào (PNG)
+                            <input type="file" id="frame-upload" accept="image/png" style="display: none;">
+                        </label>
+
+                        <div class="download-actions">
+                            <button class="btn-dl btn-dl-photo" onclick="downloadPhoto()">
+                                <i class="ph-bold ph-download-simple"></i> Tải Ảnh
+                            </button>
+                            <a id="btn-dl-video" class="btn-dl btn-dl-video" style="display: none; text-decoration: none;" download="Cici_Recap_Video.mp4">
+                                <i class="ph-bold ph-film-strip"></i> Tải Video
+                            </a>
+                        </div>
+                    </div>
 
                 </div>
             </div>
 
-            <canvas id="capture-canvas" style="display: none;"></canvas>
+            <canvas id="combine-canvas" style="display: none;"></canvas>
+            <canvas id="temp-capture-canvas" style="display: none;"></canvas>
         </main>
     </div>
 
     <script src="script.js"></script>
     <script>
         const videoEl = document.getElementById('booth-video');
-        const overlayEl = document.getElementById('booth-overlay');
         const cameraSelect = document.getElementById('camera-select');
         const btnCapture = document.getElementById('btn-capture');
         const countdownDisplay = document.getElementById('countdown-display');
+        const statusDisplay = document.getElementById('status-display');
         const flashEffect = document.getElementById('flash-effect');
-        const captureCanvas = document.getElementById('capture-canvas');
-        const ctx = captureCanvas.getContext('2d');
-        const gallery = document.getElementById('gallery');
+        
+        const resultSection = document.getElementById('result-section');
+        const finalResultImg = document.getElementById('final-result-img');
+        const btnDlVideo = document.getElementById('btn-dl-video');
+        
+        const combineCanvas = document.getElementById('combine-canvas');
+        const ctxCombine = combineCanvas.getContext('2d');
+        const tempCanvas = document.getElementById('temp-capture-canvas');
+        const ctxTemp = tempCanvas.getContext('2d');
 
         let currentStream = null;
-        let isCapturing = false;
-        let frameImg = null;
+        let isSessionRunning = false;
+        let capturedPhotos = []; // Lưu 4 ảnh base64
+        let frameImg = null;     // Lưu ảnh Frame Overlay PNG
+        let finalDataUrl = null;
 
-        // BƯỚC 1: QUẢN LÝ CAMERA
+        // Biến cho Video Recorder
+        let mediaRecorder;
+        let recordedChunks = [];
+
+        // Khởi động Camera
         async function getCameras() {
             try {
-                // Yêu cầu quyền truy cập trước để lấy tên thiết bị đầy đủ
-                await navigator.mediaDevices.getUserMedia({ video: true });
+                await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
                 const devices = await navigator.mediaDevices.enumerateDevices();
                 const videoDevices = devices.filter(device => device.kind === 'videoinput');
                 
@@ -220,158 +239,204 @@
                 });
                 
                 if(videoDevices.length > 0) startCamera();
-                else Swal.fire('Lỗi', 'Không tìm thấy camera nào kết nối với máy tính!', 'error');
-
             } catch (err) {
-                Swal.fire('Thiếu quyền', 'Vui lòng cho phép trình duyệt truy cập Camera để sử dụng tính năng này.', 'warning');
+                Swal.fire('Lỗi truy cập', 'Vui lòng cho phép trình duyệt sử dụng Camera.', 'error');
             }
         }
 
         async function startCamera() {
-            if (currentStream) {
-                currentStream.getTracks().forEach(track => track.stop());
-            }
-
+            if (currentStream) currentStream.getTracks().forEach(track => track.stop());
             const deviceId = cameraSelect.value;
-            const constraints = {
-                video: {
-                    deviceId: deviceId ? { exact: deviceId } : undefined,
-                    width: { ideal: 1920 }, // Cố gắng lấy Full HD
-                    height: { ideal: 1080 }
-                }
-            };
-
             try {
-                currentStream = await navigator.mediaDevices.getUserMedia(constraints);
+                currentStream = await navigator.mediaDevices.getUserMedia({
+                    video: { deviceId: deviceId ? { exact: deviceId } : undefined, width: { ideal: 1920 }, height: { ideal: 1080 } },
+                    audio: false
+                });
                 videoEl.srcObject = currentStream;
-            } catch (err) {
-                console.error('Lỗi mở camera: ', err);
-            }
+            } catch (err) { console.error(err); }
         }
 
-        // BƯỚC 2: QUẢN LÝ KHUNG ẢNH (OVERLAY)
+        const sleep = ms => new Promise(r => setTimeout(r, ms));
+
+        // TIẾN TRÌNH CHỤP 4 ẢNH LIÊN TỤC
+        async function startPhotoSession() {
+            if (isSessionRunning) return;
+            isSessionRunning = true;
+            capturedPhotos = [];
+            recordedChunks = [];
+            btnCapture.disabled = true;
+            resultSection.style.display = 'none';
+
+            // Kích hoạt ghi hình Video nếu được tick
+            const isRecord = document.getElementById('record-recap').checked;
+            if (isRecord && currentStream) {
+                try {
+                    // Dùng vp9 cho webm, fallback về mp4 nếu cần
+                    mediaRecorder = new MediaRecorder(currentStream, { mimeType: 'video/webm; codecs=vp9' });
+                } catch (e) {
+                    mediaRecorder = new MediaRecorder(currentStream); // Fallback mặc định của trình duyệt
+                }
+                mediaRecorder.ondataavailable = e => { if (e.data.size > 0) recordedChunks.push(e.data); };
+                mediaRecorder.start();
+            }
+
+            // Vòng lặp chụp 4 lần
+            for (let i = 1; i <= 4; i++) {
+                statusDisplay.innerText = `📸 ẢNH ${i}/4`;
+                statusDisplay.style.display = 'block';
+                
+                // Đếm ngược 3 giây
+                countdownDisplay.style.display = 'block';
+                for (let count = 3; count > 0; count--) {
+                    countdownDisplay.innerText = count;
+                    await sleep(1000);
+                }
+                countdownDisplay.style.display = 'none';
+
+                // Chớp Flash & Chụp
+                flashEffect.classList.add('flash');
+                captureSingleFrame();
+                await sleep(100);
+                flashEffect.classList.remove('flash');
+
+                // Nghỉ 1 giây cho khách đổi dáng
+                if (i < 4) await sleep(1200);
+            }
+
+            // Kết thúc
+            statusDisplay.style.display = 'none';
+            if (isRecord && mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: 'video/mp4' });
+                    const videoUrl = URL.createObjectURL(blob);
+                    btnDlVideo.href = videoUrl;
+                    btnDlVideo.style.display = 'flex';
+                };
+            } else {
+                btnDlVideo.style.display = 'none';
+            }
+
+            isSessionRunning = false;
+            btnCapture.disabled = false;
+            
+            // Vẽ 4 ảnh ra Grid 2x2
+            await renderFinalImage();
+            resultSection.style.display = 'flex';
+            
+            // Cuộn trang xuống khu vực kết quả
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        // Chụp 1 khung hình từ luồng Video, lật gương để không bị ngược chữ
+        function captureSingleFrame() {
+            tempCanvas.width = videoEl.videoWidth;
+            tempCanvas.height = videoEl.videoHeight;
+            ctxTemp.save();
+            ctxTemp.translate(tempCanvas.width, 0);
+            ctxTemp.scale(-1, 1);
+            ctxTemp.drawImage(videoEl, 0, 0, tempCanvas.width, tempCanvas.height);
+            ctxTemp.restore();
+            
+            capturedPhotos.push(tempCanvas.toDataURL('image/jpeg', 1.0));
+        }
+
+        // XỬ LÝ GHÉP 4 ẢNH VÀO CANVAS CHUẨN 4x6 (1200x1800)
+        async function renderFinalImage() {
+            if (capturedPhotos.length !== 4) return;
+
+            // Kích thước chuẩn in ấn 4x6 Portrait
+            combineCanvas.width = 1200;
+            combineCanvas.height = 1800;
+            
+            // Nền trắng
+            ctxCombine.fillStyle = '#ffffff';
+            ctxCombine.fillRect(0, 0, combineCanvas.width, combineCanvas.height);
+
+            // Thông số lưới 2x2 (Chừa lề 40px xung quanh và ở giữa)
+            const margin = 40;
+            const w = (1200 - margin * 3) / 2; // 540px
+            const h = (1800 - margin * 3) / 2; // 840px
+            const targetRatio = w / h; // Kích thước khung dọc
+
+            const slots = [
+                { x: margin, y: margin },
+                { x: margin * 2 + w, y: margin },
+                { x: margin, y: margin * 2 + h },
+                { x: margin * 2 + w, y: margin * 2 + h }
+            ];
+
+            // Tải và vẽ 4 ảnh, tự động Crop Center
+            for (let i = 0; i < 4; i++) {
+                const img = await loadImgAsync(capturedPhotos[i]);
+                const imgRatio = img.width / img.height; // Thường là 16:9 ngang
+
+                let sx, sy, sw, sh;
+                if (imgRatio > targetRatio) {
+                    // Ảnh quá ngang -> Cắt 2 bên (Center Crop)
+                    sh = img.height;
+                    sw = sh * targetRatio;
+                    sx = (img.width - sw) / 2;
+                    sy = 0;
+                } else {
+                    // Ảnh quá dọc -> Cắt trên dưới
+                    sw = img.width;
+                    sh = sw / targetRatio;
+                    sx = 0;
+                    sy = (img.height - sh) / 2;
+                }
+
+                ctxCombine.drawImage(img, sx, sy, sw, sh, slots[i].x, slots[i].y, w, h);
+            }
+
+            // Phủ Frame Overlay PNG (Nếu người dùng đã chọn)
+            if (frameImg) {
+                ctxCombine.drawImage(frameImg, 0, 0, 1200, 1800);
+            }
+
+            // Gắn vào UI Preview
+            finalDataUrl = combineCanvas.toDataURL('image/jpeg', 0.95);
+            finalResultImg.src = finalDataUrl;
+        }
+
+        // Tải Frame Overlay
         document.getElementById('frame-upload').addEventListener('change', function(e) {
             const file = e.target.files[0];
             if (!file) return;
-            
-            document.getElementById('frame-name').innerText = file.name;
             const reader = new FileReader();
             reader.onload = function(event) {
-                overlayEl.src = event.target.result;
-                overlayEl.style.display = 'block';
-                
                 frameImg = new Image();
+                frameImg.onload = () => {
+                    // Vẽ lại ngay lập tức khi tải frame mới
+                    if (capturedPhotos.length === 4) renderFinalImage();
+                };
                 frameImg.src = event.target.result;
             }
             reader.readAsDataURL(file);
-            this.value = ''; // reset
+            this.value = '';
         });
 
-        function clearFrame() {
-            overlayEl.src = "";
-            overlayEl.style.display = 'none';
-            frameImg = null;
-            document.getElementById('frame-name').innerText = "Click để tải khung đục lỗ lên";
-        }
-
-        // BƯỚC 3: LOGIC CHỤP VÀ ĐẾM NGƯỢC
-        document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space' && !isCapturing && e.target.tagName !== 'INPUT') {
-                e.preventDefault();
-                startCapture();
-            }
-        });
-
-        function startCapture() {
-            if (isCapturing) return;
-            const timer = parseInt(document.getElementById('timer-select').value);
-            
-            if (timer === 0) {
-                executeCapture();
-            } else {
-                isCapturing = true;
-                btnCapture.disabled = true;
-                let count = timer;
-                countdownDisplay.innerText = count;
-                countdownDisplay.style.display = 'block';
-
-                const interval = setInterval(() => {
-                    count--;
-                    if (count > 0) {
-                        countdownDisplay.innerText = count;
-                    } else {
-                        clearInterval(interval);
-                        countdownDisplay.style.display = 'none';
-                        executeCapture();
-                    }
-                }, 1000);
-            }
-        }
-
-        function executeCapture() {
-            // Chớp flash
-            flashEffect.classList.add('flash');
-            setTimeout(() => flashEffect.classList.remove('flash'), 150);
-
-            // Thiết lập kích thước Canvas bằng kích thước gốc của luồng Video
-            captureCanvas.width = videoEl.videoWidth;
-            captureCanvas.height = videoEl.videoHeight;
-
-            // TRỘN ẢNH
-            ctx.save();
-            // Lật ngược canvas để ảnh không bị ngược trái-phải do lật gương
-            ctx.translate(captureCanvas.width, 0);
-            ctx.scale(-1, 1);
-            ctx.drawImage(videoEl, 0, 0, captureCanvas.width, captureCanvas.height);
-            ctx.restore();
-
-            // Vẽ đè Khung Overlay (Nếu có)
-            if (frameImg) {
-                ctx.drawImage(frameImg, 0, 0, captureCanvas.width, captureCanvas.height);
-            }
-
-            // XUẤT FILE VÀ LƯU
-            const dataUrl = captureCanvas.toDataURL('image/png');
-            
-            // Add vào Gallery
-            const imgEl = document.createElement('img');
-            imgEl.className = 'gallery-item';
-            imgEl.src = dataUrl;
-            imgEl.onclick = () => showPreviewImage(dataUrl);
-            gallery.prepend(imgEl); // Thêm vào đầu danh sách
-
-            // Tự động tải xuống
-            const link = document.createElement('a');
-            link.download = `Cici_Booth_${Date.now()}.png`;
-            link.href = dataUrl;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-
-            // Reset trạng thái
-            isCapturing = false;
-            btnCapture.disabled = false;
-        }
-
-        function showPreviewImage(url) {
-            Swal.fire({
-                imageUrl: url,
-                imageAlt: 'Photobooth Result',
-                showConfirmButton: true,
-                confirmButtonText: '<i class="ph-bold ph-download-simple"></i> Tải Lại',
-                confirmButtonColor: 'var(--accent)',
-                width: 'auto'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    const link = document.createElement('a');
-                    link.download = `Cici_Booth_ReDownload_${Date.now()}.png`;
-                    link.href = url;
-                    link.click();
-                }
+        // Helper tải ảnh
+        function loadImgAsync(src) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.src = src;
             });
         }
 
-        // Khởi động
+        // Tải ảnh xuống
+        function downloadPhoto() {
+            if (!finalDataUrl) return;
+            const link = document.createElement('a');
+            link.download = `Cici_Photobooth_${Date.now()}.jpg`;
+            link.href = finalDataUrl;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Khởi động cam khi mở trang
         window.addEventListener('load', getCameras);
 
     </script>
