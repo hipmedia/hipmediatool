@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cici Kiosk Photobooth | Màn hình lớn</title>
+    <title>Cici Kiosk Photobooth | Màn Hình Lớn</title>
     <link rel="icon" type="image/png" href="logos/cicimedia.png?v=2">
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -20,37 +20,39 @@
 
         .tool-layout { display: flex; gap: 2rem; flex-wrap: wrap; width: 100%; }
 
-        /* ================= BƯỚC 1: CAMERA (MÀN HÌNH LỚN) ================= */
-        .camera-panel {
-            flex: 2.5; /* Cột camera chiếm diện tích lớn hơn hẳn */
-            min-width: 320px; background: var(--bg-surface); padding: 1.5rem;
-            border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
-            display: flex; flex-direction: column; position: relative;
+        /* ================= BƯỚC 1: CAMERA (FULL PAGE HORIZONTAL) ================= */
+        .camera-full-wrapper {
+            width: 100%; display: flex; flex-direction: column; gap: 1.5rem; align-items: center;
         }
 
         .booth-screen {
-            position: relative; width: 100%; 
-            height: 70vh; /* Cố định chiều cao bằng 70% màn hình laptop */
-            background: #000; border-radius: 12px; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+            position: relative; 
+            width: 100%; 
+            max-width: 1200px; /* Giới hạn độ rộng tối đa để không vỡ nét */
+            max-height: 65vh;  /* Chiếm 65% chiều cao màn hình laptop */
+            aspect-ratio: 3 / 2; /* Tỷ lệ NGANG chuẩn xác với khung ảnh */
+            background: #000; border-radius: 20px; overflow: hidden; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            margin: 0 auto;
         }
+        
         #booth-video { 
             width: 100%; height: 100%; 
-            object-fit: cover; /* Đảm bảo video lấp đầy màn đen không bị viền */
-            transform: scaleX(-1); 
+            object-fit: cover; /* Đảm bảo video lấp đầy tỷ lệ 3:2, tự động crop phần thừa */
+            transform: scaleX(-1); /* Lật gương để khách dễ tạo dáng */
         }
 
         #countdown-display {
             position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 15rem; /* Số đếm ngược khổng lồ */
-            font-weight: 900; color: white; text-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            font-size: 18rem; font-weight: 900; color: white; text-shadow: 0 10px 40px rgba(0,0,0,0.8);
             z-index: 20; display: none; margin: 0; line-height: 1;
         }
 
         #status-display {
-            position: absolute; top: 20px; left: 50%; transform: translateX(-50%);
-            background: rgba(239, 68, 68, 0.95); color: white; padding: 10px 30px;
-            border-radius: 30px; font-weight: bold; font-size: 1.5rem; z-index: 20; display: none; letter-spacing: 2px;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            position: absolute; top: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(239, 68, 68, 0.95); color: white; padding: 12px 40px;
+            border-radius: 40px; font-weight: 900; font-size: 1.8rem; z-index: 20; display: none; letter-spacing: 3px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
         }
 
         #flash-effect {
@@ -59,57 +61,62 @@
         }
         #flash-effect.flash { opacity: 1; }
 
-        /* BẢNG ĐIỀU KHIỂN & NÚT CHỤP */
-        .controls-panel {
-            flex: 1; min-width: 300px; background: var(--bg-surface); padding: 1.5rem;
-            border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
-            display: flex; flex-direction: column; gap: 1.2rem;
+        /* BẢNG ĐIỀU KHIỂN NẰM NGANG BÊN DƯỚI */
+        .bottom-dashboard {
+            width: 100%; max-width: 1200px; background: var(--bg-surface); padding: 1.5rem 2rem;
+            border-radius: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
+            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; align-items: center;
         }
 
-        .setting-group { margin-bottom: 0.5rem; }
-        .setting-group label { display: block; font-weight: 600; font-size: 0.9rem; margin-bottom: 0.5rem; }
-        .prop-input { width: 100%; padding: 0.8rem; border-radius: 8px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-primary); font-family: inherit; font-size: 0.9rem; }
+        .dashboard-settings { display: flex; flex-direction: column; gap: 1rem; }
+
+        .setting-group { margin: 0; }
+        .setting-group label { display: block; font-weight: 700; font-size: 0.95rem; margin-bottom: 0.4rem; color: var(--text-primary);}
+        .prop-input { width: 100%; padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid var(--border-color); background: var(--bg-body); color: var(--text-primary); font-family: inherit; font-size: 0.95rem; }
+
+        .toggle-recap { display: flex; align-items: center; gap: 0.8rem; background: var(--bg-body); padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid var(--border-color); cursor: pointer; }
+        .toggle-recap input { width: 20px; height: 20px; cursor: pointer; accent-color: var(--accent); }
+        .toggle-recap span { font-weight: 600; font-size: 1rem; color: var(--text-primary); }
 
         .btn-capture {
-            background: #ef4444; color: white; border: none; 
-            padding: 2rem 1rem; /* Nút siêu to */
-            border-radius: 16px; font-weight: 900; font-size: 1.8rem; cursor: pointer;
+            background: #ef4444; color: white; border: none; height: 100%; min-height: 120px;
+            border-radius: 16px; font-weight: 900; font-size: 2.2rem; cursor: pointer;
             display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;
-            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.4); transition: 0.2s; margin-top: auto; text-transform: uppercase;
+            box-shadow: 0 15px 35px rgba(239, 68, 68, 0.4); transition: 0.2s; text-transform: uppercase; letter-spacing: 2px;
         }
-        .btn-capture i { font-size: 3rem; margin-bottom: -5px; }
-        .btn-capture:hover { background: #dc2626; transform: scale(1.03); box-shadow: 0 15px 35px rgba(239, 68, 68, 0.5); }
-        .btn-capture:active { transform: scale(0.98); }
+        .btn-capture i { font-size: 3.5rem; margin-bottom: -5px; }
+        .btn-capture:hover { background: #dc2626; transform: translateY(-5px); box-shadow: 0 20px 45px rgba(239, 68, 68, 0.5); }
+        .btn-capture:active { transform: translateY(0); }
         .btn-capture:disabled { background: #9ca3af; box-shadow: none; cursor: not-allowed; transform: none; }
 
         /* ================= BƯỚC 2: KẾT QUẢ & CHỌN KHUNG ================= */
         .preview-large-panel {
-            flex: 2.5; min-width: 320px; background: var(--bg-surface); padding: 1.5rem;
-            border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
+            flex: 2; min-width: 320px; background: var(--bg-surface); padding: 1.5rem;
+            border-radius: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
             display: flex; flex-direction: column; align-items: center;
         }
 
         .result-preview-box {
-            width: 100%; background: var(--bg-body); border-radius: 12px; padding: 1rem; 
+            width: 100%; background: var(--bg-body); border-radius: 16px; padding: 1rem; 
             display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);
-            height: 70vh; overflow: hidden; box-shadow: inset 0 0 20px rgba(0,0,0,0.1);
+            height: 65vh; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
         }
         
         #final-result-img { 
             max-width: 100%; max-height: 100%; object-fit: contain; 
-            border-radius: 8px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); transition: 0.3s;
+            border-radius: 12px; box-shadow: 0 15px 35px rgba(0,0,0,0.25); transition: 0.3s;
         }
 
         .download-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; width: 100%; margin-top: 1.5rem; }
         .btn-dl { padding: 1.2rem; border-radius: 12px; font-weight: 800; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: white; font-size: 1.1rem; transition: 0.2s;}
-        .btn-dl-photo { background: var(--accent); } .btn-dl-photo:hover { background: #0284c7; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(14,165,233,0.3); }
-        .btn-dl-video { background: #10b981; text-decoration: none; display: none; } .btn-dl-video:hover { background: #059669; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(16,185,129,0.3); }
-        .btn-dl-sync { background: #f97316; grid-column: span 2; } .btn-dl-sync:hover { background: #ea580c; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(249,115,22,0.3); }
+        .btn-dl-photo { background: var(--accent); } .btn-dl-photo:hover { background: #0284c7; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(14,165,233,0.3);}
+        .btn-dl-video { background: #10b981; text-decoration: none; display: none; } .btn-dl-video:hover { background: #059669; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(16,185,129,0.3);}
+        .btn-dl-sync { background: #f97316; grid-column: span 2; } .btn-dl-sync:hover { background: #ea580c; transform: translateY(-3px); box-shadow: 0 10px 20px rgba(249,115,22,0.3);}
 
         .frame-selector-panel {
-            flex: 1; min-width: 300px; background: var(--bg-surface); padding: 1.5rem;
-            border-radius: 16px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
-            display: flex; flex-direction: column; gap: 1.5rem; height: calc(70vh + 3rem); overflow-y: auto;
+            flex: 1; min-width: 350px; background: var(--bg-surface); padding: 1.5rem;
+            border-radius: 20px; border: 1px solid var(--border-color); box-shadow: var(--shadow);
+            display: flex; flex-direction: column; gap: 1.5rem; height: calc(65vh + 3rem); overflow-y: auto;
         }
         .frame-selector-panel::-webkit-scrollbar { width: 6px; }
         .frame-selector-panel::-webkit-scrollbar-thumb { background: #ccc; border-radius: 4px; }
@@ -126,31 +133,24 @@
             content: "✓"; position: absolute; top: -10px; right: -10px; background: var(--accent); color: white;
             width: 25px; height: 25px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 1rem; border: 3px solid white;
         }
-        .frame-thumb { 
-            width: 100%; height: 140px; object-fit: contain; border-radius: 8px; background: #e2e8f0; padding: 5px;
-        }
+        .frame-thumb { width: 100%; height: 140px; object-fit: contain; border-radius: 8px; background: #e2e8f0; padding: 5px; }
         .frame-name { font-weight: 700; font-size: 0.9rem; text-align: center; margin-top: 0.8rem; color: var(--text-primary); }
 
         .upload-custom-frame {
             border: 2px dashed var(--accent); background: var(--bg-body); border-radius: 12px;
-            padding: 2rem 1.5rem; text-align: center; cursor: pointer; transition: 0.3s; margin-top: 1rem;
+            padding: 2rem 1.5rem; text-align: center; cursor: pointer; transition: 0.3s;
         }
         .upload-custom-frame:hover { background: var(--accent-light); }
 
         .btn-outline { background: transparent; border: 2px solid var(--border-color); padding: 1.2rem; border-radius: 12px; cursor: pointer; font-weight: 700; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto; font-size: 1.1rem; color: var(--text-primary);}
         .btn-outline:hover { background: var(--bg-surface-hover); border-color: var(--text-primary); }
 
-        .toggle-recap { display: flex; align-items: center; gap: 0.8rem; background: var(--bg-body); padding: 1.2rem; border-radius: 12px; border: 1px solid var(--border-color); cursor: pointer; }
-        .toggle-recap input { width: 22px; height: 22px; cursor: pointer; accent-color: var(--accent); }
-        .toggle-recap span { font-weight: 600; font-size: 1rem; }
-
-        .config-box { background: var(--bg-body); padding: 1rem; border-radius: 12px; border: 1px dashed #f97316; margin-top: 1rem; }
     </style>
 </head>
 <body>
     <div class="app-layout">
         <aside class="sidebar" id="sidebar">
-            <div class="brand"><img src="logos/cicimedia.png" alt="Cici Media Logo" class="brand-logo"></div>
+            <div class="brand"><img src="https://cicivn.io.vn/assets/images/branding/logo-placeholder.png" alt="Cici Media Logo" class="brand-logo"></div>
             <nav class="menu">
                 <div class="menu-label">MENU CHÍNH</div>
                 <a href="index.html" class="menu-item"><i class="ph ph-squares-four"></i> Tổng quan</a>
@@ -165,43 +165,39 @@
         <main class="main-content">
             
             <div id="step-1" class="step-container active">
-                <header class="topbar" style="margin-bottom: 1.5rem;">
-                    <div>
-                        <h1 class="page-title">Cici Photobooth Kiosk</h1>
-                        <p class="page-subtitle">Hệ thống sẽ chụp 4 ảnh liên tiếp. Hãy soi gương, chỉnh trang và sẵn sàng!</p>
+                <div class="camera-full-wrapper">
+                    <div class="booth-screen">
+                        <video id="booth-video" autoplay playsinline muted></video>
+                        <div id="status-display">📸 ẢNH 1/4</div>
+                        <p id="countdown-display">3</p>
+                        <div id="flash-effect"></div>
                     </div>
-                </header>
+                    
+                    <p style="text-align: center; font-size: 1rem; color: var(--text-secondary); margin: 0;">
+                        <i class="ph-fill ph-lightbulb"></i> Máy sẽ tự động chụp 4 lần. Hãy soi gương, chỉnh trang và nhấn phím <b>Space</b> để bắt đầu!
+                    </p>
 
-                <div class="tool-layout">
-                    <div class="camera-panel">
-                        <div class="booth-screen">
-                            <video id="booth-video" autoplay playsinline muted></video>
-                            <div id="status-display">📸 ẢNH 1/4</div>
-                            <p id="countdown-display">3</p>
-                            <div id="flash-effect"></div>
-                        </div>
-                    </div>
-
-                    <div class="controls-panel">
-                        <div class="setting-group">
-                            <label><i class="ph-bold ph-video-camera"></i> Nguồn Camera</label>
-                            <select id="camera-select" class="prop-input" onchange="startCamera()"></select>
-                        </div>
-
-                        <label class="toggle-recap">
-                            <input type="checkbox" id="record-recap" checked>
-                            <span>Quay Video Recap <br><small style="font-weight:400; color:#666;">Ghi lại khoảnh khắc hậu trường</small></span>
-                        </label>
-
-                        <div class="config-box">
-                            <label style="font-size: 0.85rem; font-weight: bold; color: #ea580c; margin-bottom: 0.5rem; display: block;"><i class="ph ph-google-drive"></i> Link Google Drive Sự Kiện (Auto Save)</label>
-                            <input type="text" id="drive-folder-url" class="prop-input" placeholder="Dán link thư mục Google Drive vào đây..." onchange="saveConfig()" style="border-color: #f97316;">
+                    <div class="bottom-dashboard">
+                        <div class="dashboard-settings">
+                            <div style="display: flex; gap: 1rem;">
+                                <div class="setting-group" style="flex: 1;">
+                                    <label><i class="ph-bold ph-video-camera"></i> Nguồn Camera</label>
+                                    <select id="camera-select" class="prop-input" onchange="startCamera()"></select>
+                                </div>
+                                <div class="setting-group" style="flex: 1.5;">
+                                    <label style="color: #ea580c;"><i class="ph-bold ph-google-drive"></i> Link Thư Mục Drive (Auto Save)</label>
+                                    <input type="text" id="drive-folder-url" class="prop-input" placeholder="Dán link thư mục Drive..." onchange="saveConfig()" style="border-color: #ea580c;">
+                                </div>
+                            </div>
+                            <label class="toggle-recap">
+                                <input type="checkbox" id="record-recap" checked>
+                                <span>Quay Video Recap <small style="font-weight:400; color:#666;">(Lưu lại khoảnh khắc trêu đùa hậu trường)</small></span>
+                            </label>
                         </div>
 
                         <button class="btn-capture" id="btn-capture" onclick="startPhotoSession()">
                             <i class="ph-fill ph-camera"></i> BẮT ĐẦU CHỤP
                         </button>
-                        <p style="text-align: center; font-size: 0.9rem; color: var(--text-secondary); margin-top: 0.5rem;">Hoặc nhấn phím <b>Space</b></p>
                     </div>
                 </div>
             </div>
@@ -210,7 +206,7 @@
                 <header class="topbar" style="margin-bottom: 1.5rem;">
                     <div>
                         <h1 class="page-title">Hoàn thiện tác phẩm</h1>
-                        <p class="page-subtitle">Hãy chọn bộ khung yêu thích nhất bên phải. Bạn có thể thử nhiều khung khác nhau!</p>
+                        <p class="page-subtitle">Chọn khung bên phải. Bạn có thể thử nhiều khung khác nhau trước khi lưu!</p>
                     </div>
                 </header>
 
@@ -221,13 +217,13 @@
                         </div>
                         <div class="download-actions">
                             <button class="btn-dl btn-dl-photo" onclick="downloadPhoto()">
-                                <i class="ph-bold ph-download-simple"></i> LƯU ẢNH VỀ MÁY
+                                <i class="ph-bold ph-download-simple"></i> LƯU ẢNH COLLAGE
                             </button>
                             <a id="btn-dl-video" class="btn-dl btn-dl-video" download="Cici_Recap_Video.mp4">
                                 <i class="ph-bold ph-film-strip"></i> LƯU VIDEO RECAP
                             </a>
                             <button class="btn-dl btn-dl-sync" onclick="syncToDrive()">
-                                <i class="ph-bold ph-cloud-arrow-up"></i> ĐỒNG BỘ BẢN NÀY LÊN GOOGLE DRIVE
+                                <i class="ph-bold ph-cloud-arrow-up"></i> ĐỒNG BỘ ẢNH NÀY LÊN GOOGLE DRIVE
                             </button>
                         </div>
                     </div>
@@ -241,7 +237,7 @@
                         <div class="upload-custom-frame" onclick="document.getElementById('frame-upload').click()" id="upload-custom-box">
                             <i class="ph-bold ph-upload-simple" style="font-size: 2.5rem; color: var(--accent); margin-bottom: 0.5rem;"></i>
                             <h4 style="margin: 0; color: var(--text-primary); font-size: 1.1rem;">Tải khung PNG bất kỳ</h4>
-                            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.4;" id="custom-frame-name">Hệ thống AI sẽ tự động quét lỗ đục và lồng ảnh.</p>
+                            <p style="color: var(--text-secondary); font-size: 0.85rem; margin-top: 0.5rem; line-height: 1.4;" id="custom-frame-name">Hệ thống AI sẽ tự quét lỗ đục và lồng ảnh.</p>
                             <input type="file" id="frame-upload" accept="image/png">
                         </div>
 
@@ -262,7 +258,7 @@
         // =========================================================
         // ⚠️ ĐIỀN LINK WEB APP APPS SCRIPT CỐ ĐỊNH CỦA BẠN VÀO ĐÂY
         // =========================================================
-        const APPS_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx24dSeLOMPu277ejA2RpHKglgPXWzBbyzBUwteeU0qhKEy5bRPZduXHMRq9lRVkelV/exec"; 
+        const APPS_SCRIPT_URL = "ĐIỀN_LINK_APPS_SCRIPT_VÀO_ĐÂY"; 
 
         // DOM Elements
         const step1 = document.getElementById('step-1');
@@ -295,21 +291,18 @@
         let mediaRecorder, recordedChunks = [];
         let currentVideoBlob = null;
 
-        // Lưu cấu hình Link Thư mục Drive cục bộ
         document.getElementById('drive-folder-url').value = localStorage.getItem('cici_drive_folder_url') || "";
         function saveConfig() { localStorage.setItem('cici_drive_folder_url', document.getElementById('drive-folder-url').value.trim()); }
 
         const presetFrames = [
-            { id: 'frame_1', name: 'Dải Ảnh Hàn Quốc', thumb: 'logos/strip1_thumb.png', full: 'logos/strip1.png' },
-            { id: 'frame_2', name: 'Cổ Điển Ngang', thumb: 'logos/strip2_thumb.png', full: 'logos/strip2.png' },
-            { id: 'frame_3', name: 'Steven Universe', thumb: 'logos/strip3_thumb.png', full: 'logos/strip3.png' }
+            { id: 'frame_1', name: 'Dải Ảnh Hàn Quốc', thumb: 'frame/khung1.png', full: 'frame/khung1.png' },
+            { id: 'frame_2', name: 'Cổ Điển Ngang', thumb: 'frame/khung2.png', full: 'frame/khung2.png' },
+            { id: 'frame_3', name: 'Steven Universe', thumb: 'frame/khung3.png', full: 'frame/khung3.png' }
         ];
 
         window.addEventListener('load', () => {
             renderFramesList();
             getCameras();
-            
-            // Nạp khung đầu tiên ngầm
             if(presetFrames.length > 0) {
                 const img = new Image();
                 img.onload = () => { frameImgObj = img; detectedSlots = autoScanTransparentSlots(img); };
@@ -432,7 +425,7 @@
             document.querySelectorAll('.frame-card').forEach(c => c.classList.remove('selected'));
             uploadCustomBox.style.borderColor = '#10b981';
             uploadCustomBox.style.background = 'rgba(16, 185, 129, 0.1)';
-            customFrameName.innerText = "Đang áp dụng: " + file.name;
+            customFrameName.innerText = "Đã tải: " + file.name;
 
             const reader = new FileReader();
             reader.onload = function(event) { loadFrameImageToMemory(event.target.result); }
@@ -488,15 +481,20 @@
             
             for (let i = 0; i < maxPhotos; i++) {
                 const img = await loadImgAsync(capturedPhotos[i]); const slot = detectedSlots[i];
-                const targetRatio = slot.w / slot.h; const imgRatio = img.width / img.height; 
+                
+                // MỞ RỘNG ẢNH RA 1 XÍU ĐỂ KHÔNG BỊ HỞ VIỀN DO BO GÓC
+                const bleed = 4;
+                const targetRatio = (slot.w + bleed*2) / (slot.h + bleed*2); 
+                const imgRatio = img.width / img.height; 
                 let sx, sy, sw, sh;
                 if (imgRatio > targetRatio) { sh = img.height; sw = sh * targetRatio; sx = (img.width - sw) / 2; sy = 0; } 
                 else { sw = img.width; sh = sw / targetRatio; sx = 0; sy = (img.height - sh) / 2; }
+                
                 ctxCombine.save(); ctxCombine.beginPath(); ctxCombine.roundRect(slot.x, slot.y, slot.w, slot.h, 25); ctxCombine.clip();
-                ctxCombine.drawImage(img, sx, sy, sw, sh, slot.x, slot.y, slot.w, slot.h); ctxCombine.restore();
+                ctxCombine.drawImage(img, sx, sy, sw, sh, slot.x - bleed, slot.y - bleed, slot.w + bleed*2, slot.h + bleed*2); ctxCombine.restore();
             }
             ctxCombine.drawImage(frameImgObj, 0, 0, combineCanvas.width, combineCanvas.height);
-            finalDataUrl = combineCanvas.toDataURL('image/jpeg', 0.85); finalResultImg.src = finalDataUrl;
+            finalDataUrl = combineCanvas.toDataURL('image/jpeg', 0.90); finalResultImg.src = finalDataUrl;
         }
 
         function loadImgAsync(src) { return new Promise((resolve) => { const img = new Image(); img.onload = () => resolve(img); img.src = src; }); }
@@ -514,7 +512,7 @@
             const driveLink = document.getElementById('drive-folder-url').value.trim();
             if (!driveLink) return Swal.fire('Thiếu thông tin', 'Vui lòng quay lại màn hình chụp, dán Link thư mục Google Drive của sự kiện vào cấu hình.', 'warning');
             
-            if (APPS_SCRIPT_URL === "ĐIỀN_LINK_APPS_SCRIPT_VÀO_ĐÂY") {
+            if (APPS_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbx24dSeLOMPu277ejA2RpHKglgPXWzBbyzBUwteeU0qhKEy5bRPZduXHMRq9lRVkelV/exec") {
                 return Swal.fire('Lỗi Dev', 'Bạn chưa điền mã APPS_SCRIPT_URL cố định ở dòng 353 của file HTML.', 'error');
             }
 
