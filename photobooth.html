@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cici Kiosk Photobooth | Chụp trước - Chọn khung sau</title>
+    <title>Cici Kiosk Photobooth | Chụp & Chọn Khung</title>
     <link rel="icon" type="image/png" href="logos/cicimedia.png?v=2">
     <link rel="stylesheet" href="style.css">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -79,20 +79,19 @@
         .result-preview-box {
             width: 100%; background: var(--bg-body); border-radius: 12px; padding: 1rem; 
             display: flex; align-items: center; justify-content: center; border: 1px solid var(--border-color);
-            height: 65vh; /* Chiều cao cố định để view luôn đẹp */
-            overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
+            height: 65vh; overflow: hidden; box-shadow: inset 0 0 15px rgba(0,0,0,0.05);
         }
         
         #final-result-img { 
             max-width: 100%; max-height: 100%; object-fit: contain; 
-            border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
-            transition: 0.3s;
+            border-radius: 8px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: 0.3s;
         }
 
         .download-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; width: 100%; margin-top: 1.5rem; }
         .btn-dl { padding: 1rem; border-radius: 10px; font-weight: bold; cursor: pointer; border: none; display: flex; align-items: center; justify-content: center; gap: 0.5rem; color: white; font-size: 1rem; transition: 0.2s;}
         .btn-dl-photo { background: var(--accent); } .btn-dl-photo:hover { background: #0284c7; transform: translateY(-2px); }
         .btn-dl-video { background: #10b981; text-decoration: none; display: none; } .btn-dl-video:hover { background: #059669; transform: translateY(-2px); }
+        .btn-dl-sync { background: #f97316; grid-column: span 2; } .btn-dl-sync:hover { background: #ea580c; transform: translateY(-2px); }
 
         .frame-selector-panel {
             flex: 1; min-width: 320px; background: var(--bg-surface); padding: 1.5rem;
@@ -106,6 +105,7 @@
         .frame-card {
             background: var(--bg-body); border: 2px solid transparent; border-radius: 12px;
             padding: 0.5rem; cursor: pointer; transition: 0.2s; position: relative;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
         .frame-card:hover { border-color: var(--accent-light); transform: translateY(-2px); }
         .frame-card.selected { border-color: var(--accent); background: var(--accent-light); }
@@ -113,7 +113,11 @@
             content: "✓"; position: absolute; top: 10px; right: 10px; background: var(--accent); color: white;
             width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 0.8rem;
         }
-        .frame-thumb { width: 100%; aspect-ratio: 9/16; object-fit: cover; border-radius: 6px; background: #e2e8f0; }
+        /* CẬP NHẬT CSS HỖ TRỢ CẢ KHUNG NGANG LẪN DỌC */
+        .frame-thumb { 
+            width: 100%; height: 120px; object-fit: contain; /* Contain giúp không bị xén ảnh */
+            border-radius: 6px; background: #e2e8f0; padding: 4px;
+        }
         .frame-name { font-weight: 600; font-size: 0.85rem; text-align: center; margin-top: 0.5rem; color: var(--text-primary); }
 
         .upload-custom-frame {
@@ -125,6 +129,7 @@
         .btn-outline { background: transparent; border: 1px solid var(--border-color); padding: 1rem; border-radius: 10px; cursor: pointer; font-weight: 600; width: 100%; display: flex; align-items: center; justify-content: center; gap: 0.5rem; margin-top: auto; font-size: 1rem;}
         .btn-outline:hover { background: var(--bg-surface-hover); }
 
+        .config-box { background: var(--bg-body); padding: 1rem; border-radius: 8px; border: 1px dashed var(--text-secondary); margin-top: 1rem; }
     </style>
 </head>
 <body>
@@ -148,7 +153,7 @@
                 <header class="topbar" style="margin-bottom: 1.5rem;">
                     <div>
                         <h1 class="page-title">Sẵn sàng tạo dáng!</h1>
-                        <p class="page-subtitle">Hệ thống sẽ chụp 4 ảnh liên tiếp. Nhấn phím Space hoặc nút bên dưới để bắt đầu.</p>
+                        <p class="page-subtitle">Hệ thống sẽ chụp 4 ảnh liên tiếp. Đổi dáng sau mỗi lần chớp đèn Flash nhé.</p>
                     </div>
                 </header>
 
@@ -160,14 +165,11 @@
                             <p id="countdown-display">3</p>
                             <div id="flash-effect"></div>
                         </div>
-                        <p style="text-align: center; font-size: 0.9rem; color: var(--text-secondary); margin-top: 1rem;">
-                            <i class="ph-fill ph-lightbulb"></i> Đổi dáng sau mỗi lần chớp đèn Flash nhé!
-                        </p>
                     </div>
 
                     <div class="controls-panel">
                         <div class="setting-group">
-                            <label><i class="ph-bold ph-video-camera"></i> Đổi Camera</label>
+                            <label><i class="ph-bold ph-video-camera"></i> Nguồn Camera</label>
                             <select id="camera-select" class="prop-input" onchange="startCamera()"></select>
                         </div>
 
@@ -179,6 +181,12 @@
                         <button class="btn-capture" id="btn-capture" onclick="startPhotoSession()">
                             <i class="ph-fill ph-camera"></i> BẮT ĐẦU CHỤP (4 ẢNH)
                         </button>
+                        <p style="text-align: center; font-size: 0.85rem; color: var(--text-secondary); margin-top: 0.5rem;">Hoặc nhấn phím <b>Space</b></p>
+
+                        <div class="config-box">
+                            <label style="font-size: 0.85rem; font-weight: bold; color: var(--text-secondary); margin-bottom: 0.3rem; display: block;">⚙️ URL Google Apps Script (Drive Sync)</label>
+                            <input type="text" id="sheet-url" class="prop-input" placeholder="Dán URL Web App vào đây..." onchange="saveConfig()">
+                        </div>
                     </div>
                 </div>
             </div>
@@ -186,8 +194,8 @@
             <div id="step-2" class="step-container">
                 <header class="topbar" style="margin-bottom: 1.5rem;">
                     <div>
-                        <h1 class="page-title">Lựa chọn khung viền</h1>
-                        <p class="page-subtitle">Chọn khung yêu thích bên phải. AI sẽ tự động ghép ảnh của bạn lọt khít vào khung.</p>
+                        <h1 class="page-title">Hoàn thiện tác phẩm</h1>
+                        <p class="page-subtitle">Chọn khung yêu thích bên phải. Hỗ trợ khung ngang, khung dọc, dải ảnh strip...</p>
                     </div>
                 </header>
 
@@ -203,6 +211,9 @@
                             <a id="btn-dl-video" class="btn-dl btn-dl-video" download="Cici_Recap_Video.mp4">
                                 <i class="ph-bold ph-film-strip"></i> LƯU VIDEO RECAP
                             </a>
+                            <button class="btn-dl btn-dl-sync" onclick="syncToDrive()">
+                                <i class="ph-bold ph-cloud-arrow-up"></i> ĐỒNG BỘ LÊN GOOGLE DRIVE
+                            </button>
                         </div>
                     </div>
 
@@ -215,13 +226,13 @@
                         <div style="font-weight: 700; font-size: 1.1rem; color: var(--accent); margin-top: 1rem;"><i class="ph-bold ph-upload-simple"></i> Khung Tự Chế</div>
                         <div class="upload-custom-frame" onclick="document.getElementById('frame-upload').click()" id="upload-custom-box">
                             <i class="ph-bold ph-upload-simple" style="font-size: 2rem; color: var(--accent); margin-bottom: 0.5rem;"></i>
-                            <h4 style="margin: 0; color: var(--text-primary);">Tải khung PNG</h4>
+                            <h4 style="margin: 0; color: var(--text-primary);">Tải khung PNG bất kỳ</h4>
                             <p style="color: var(--text-secondary); font-size: 0.8rem; margin-top: 0.5rem;" id="custom-frame-name">Hỗ trợ tự động quét lỗ đục.</p>
                             <input type="file" id="frame-upload" accept="image/png">
                         </div>
 
                         <button class="btn-outline" onclick="goToStep1()">
-                            <i class="ph-bold ph-camera-rotate"></i> CHỤP LẠI LƯỢT MỚI
+                            <i class="ph-bold ph-camera-rotate"></i> QUAY VỀ CHỤP LƯỢT MỚI
                         </button>
                     </div>
                 </div>
@@ -261,21 +272,33 @@
         let capturedPhotos = []; 
         let finalDataUrl = null;
         let frameImgObj = null; 
-        let detectedSlots = []; // Tọa độ 4 lỗ tự động quét được
+        let detectedSlots = []; 
         let mediaRecorder, recordedChunks = [];
+        let currentVideoBlob = null;
 
-        // MẪU KHUNG CÓ SẴN (Sửa đường dẫn file png của bạn vào đây)
-        // Lưu ý: Các file full frame phải đục lỗ trong suốt sẵn
+        // Config Google Apps Script URL
+        document.getElementById('sheet-url').value = localStorage.getItem('cici_sheet_url') || "";
+        function saveConfig() { localStorage.setItem('cici_sheet_url', document.getElementById('sheet-url').value.trim()); }
+
+        // MẪU KHUNG CÓ SẴN (Hỗ trợ cả Ngang và Dọc)
         const presetFrames = [
-            { id: 'frame_1', name: 'Strip Cổ Điển', thumb: 'frame/strip_hong.png', full: 'frame/strip_hong.png' },
-            { id: 'frame_2', name: 'Steven Universe', thumb: 'frame/strip_hong2.png', full: 'frame/strip_hong2.png' },
-            { id: 'frame_3', name: 'Party Night', thumb: 'frame/strip_hong.png', full: 'frame/strip_hong.png' }
+            { id: 'frame_1', name: 'Strip Hồng (Dọc)', thumb: 'logos/strip1_thumb.png', full: 'logos/strip1.png' },
+            { id: 'frame_2', name: 'Vintage (Ngang)', thumb: 'logos/strip2_thumb.png', full: 'logos/strip2.png' },
+            { id: 'frame_3', name: 'Steven Universe', thumb: 'logos/strip3_thumb.png', full: 'logos/strip3.png' }
         ];
 
         // KHỞI TẠO
         window.addEventListener('load', () => {
             renderFramesList();
             getCameras();
+            
+            // Nạp khung đầu tiên ngầm
+            if(presetFrames.length > 0) {
+                const img = new Image();
+                img.onload = () => { frameImgObj = img; detectedSlots = autoScanTransparentSlots(img); };
+                img.src = presetFrames[0].full;
+                document.getElementById(`card-${presetFrames[0].id}`).classList.add('selected');
+            }
         });
 
         // ================= BƯỚC 1: QUẢN LÝ CAMERA & CHỤP =================
@@ -308,7 +331,6 @@
 
         const sleep = ms => new Promise(r => setTimeout(r, ms));
 
-        // Phím Space để chụp nhanh
         document.addEventListener('keydown', e => { 
             if (e.code === 'Space' && step1.classList.contains('active') && !isSessionRunning && e.target.tagName !== 'INPUT') { 
                 e.preventDefault(); startPhotoSession(); 
@@ -318,7 +340,7 @@
         async function startPhotoSession() {
             if (isSessionRunning) return;
             isSessionRunning = true;
-            capturedPhotos = []; recordedChunks = [];
+            capturedPhotos = []; recordedChunks = []; currentVideoBlob = null;
             btnCapture.disabled = true;
 
             const isRecord = document.getElementById('record-recap').checked;
@@ -345,18 +367,25 @@
             }
 
             statusDisplay.style.display = 'none';
+            
+            // XỬ LÝ SAU KHI CHỤP (KHÔNG CÒN AUTO UPLOAD)
             if (isRecord && mediaRecorder && mediaRecorder.state !== 'inactive') {
-                mediaRecorder.stop();
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(recordedChunks, { type: 'video/mp4' });
-                    btnDlVideo.href = URL.createObjectURL(blob); btnDlVideo.style.display = 'flex';
+                mediaRecorder.onstop = async () => {
+                    currentVideoBlob = new Blob(recordedChunks, { type: 'video/mp4' });
+                    btnDlVideo.href = URL.createObjectURL(currentVideoBlob); 
+                    btnDlVideo.style.display = 'flex';
+                    
+                    await combineUsingDetectedSlots();
+                    goToStep2();
                 };
-            } else { btnDlVideo.style.display = 'none'; }
+                mediaRecorder.stop();
+            } else { 
+                btnDlVideo.style.display = 'none'; 
+                await combineUsingDetectedSlots();
+                goToStep2();
+            }
 
             isSessionRunning = false; btnCapture.disabled = false;
-            
-            // Xong -> Chuyển sang Bước 2 (Màn hình chọn khung)
-            goToStep2();
         }
 
         function captureSingleFrame() {
@@ -371,11 +400,9 @@
             step1.classList.remove('active');
             step2.classList.add('active');
             
-            // Nếu khách chưa chọn khung nào, tự động chọn khung đầu tiên làm mặc định để preview không bị trống
             if (!frameImgObj && presetFrames.length > 0) {
                 selectPresetFrame(presetFrames[0].id);
             } else {
-                // Nếu đã có khung (do lần chụp trước), vẽ lại ngay
                 combineUsingDetectedSlots();
             }
         }
@@ -383,7 +410,6 @@
         function goToStep1() {
             step2.classList.remove('active');
             step1.classList.add('active');
-            finalResultImg.src = ""; // Clear preview
         }
 
         function renderFramesList() {
@@ -437,18 +463,16 @@
 
         // AI QUÉT LỖ & GHÉP ẢNH LÊN CANVAS
         function loadFrameImageToMemory(src) {
-            finalResultImg.style.opacity = '0.5'; // Làm mờ lúc đang xử lý
+            finalResultImg.style.opacity = '0.5'; 
             
             frameImgObj = new Image();
             frameImgObj.onload = () => {
-                // AI Quét tìm lỗ đục
                 detectedSlots = autoScanTransparentSlots(frameImgObj);
                 
                 if (detectedSlots.length === 0) {
                     Swal.fire({toast: true, position: 'top-end', icon: 'info', title: 'Khung không có lỗ đục. Dùng nền trắng.', showConfirmButton: false, timer: 2000});
                 }
                 
-                // Vẽ và Preview
                 combineUsingDetectedSlots();
                 finalResultImg.style.opacity = '1';
             };
@@ -512,6 +536,7 @@
         async function combineUsingDetectedSlots() {
             if (!frameImgObj || capturedPhotos.length === 0) return;
             
+            // Canvas sẽ tự động theo kích thước khung (Dù ngang hay dọc)
             combineCanvas.width = frameImgObj.width; 
             combineCanvas.height = frameImgObj.height; 
             
@@ -543,11 +568,11 @@
                 ctxCombine.restore();
             }
 
-            // Phủ Frame đục lỗ lên trên cùng
+            // Phủ Frame PNG lên trên cùng
             ctxCombine.drawImage(frameImgObj, 0, 0, combineCanvas.width, combineCanvas.height);
 
-            // Cập nhật UI Preview
-            finalDataUrl = combineCanvas.toDataURL('image/jpeg', 0.95);
+            // Cập nhật UI Preview (Xuất chất lượng 0.85 để tối ưu dung lượng khi gửi API)
+            finalDataUrl = combineCanvas.toDataURL('image/jpeg', 0.85);
             finalResultImg.src = finalDataUrl;
         }
 
@@ -560,8 +585,71 @@
         function downloadPhoto() {
             if (!finalDataUrl) return;
             const link = document.createElement('a'); 
-            link.download = `Cici_Collage_${Date.now()}.jpg`; 
-            link.href = finalDataUrl; link.click();
+            link.href = combineCanvas.toDataURL('image/png');
+            link.download = `Cici_Collage_${Date.now()}.png`; 
+            link.click();
+        }
+
+        // ================= BƯỚC 3: ĐỒNG BỘ THỦ CÔNG LÊN DRIVE =================
+        function blobToBase64(blob) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+            });
+        }
+
+        async function syncToDrive() {
+            const scriptURL = localStorage.getItem('cici_sheet_url'); 
+            if (!scriptURL) {
+                return Swal.fire('Lỗi', 'Vui lòng dán URL Google Apps Script vào ô cấu hình góc dưới bên phải.', 'error');
+            }
+
+            if (!finalDataUrl) {
+                return Swal.fire('Thông báo', 'Chưa có ảnh nào để đồng bộ.', 'warning');
+            }
+
+            Swal.fire({
+                title: 'Đang đẩy dữ liệu...',
+                html: 'Vui lòng đợi vài giây để hệ thống đưa file lên Google Drive.',
+                allowOutsideClick: false,
+                didOpen: () => { Swal.showLoading(); }
+            });
+
+            try {
+                // Base64 ảnh
+                const photoBase64 = finalDataUrl.split(',')[1];
+                let videoBase64 = null;
+
+                if (currentVideoBlob) {
+                    videoBase64 = await blobToBase64(currentVideoBlob);
+                }
+                
+                const timestamp = Date.now();
+                const payload = {
+                    type: 'upload_booth',
+                    photoName: `Cici_Booth_${timestamp}.jpg`,
+                    photoBase64: photoBase64,
+                    videoName: `Cici_Recap_${timestamp}.mp4`,
+                    videoBase64: videoBase64
+                };
+
+                await fetch(scriptURL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                Swal.close();
+                Swal.fire({ title: 'Thành công!', text: 'Ảnh & Video đã được lưu an toàn trên Google Drive của bạn.', icon: 'success' });
+
+            } catch (error) {
+                Swal.close();
+                console.error("Lỗi upload Drive:", error);
+                Swal.fire('Thất bại', 'Có lỗi xảy ra khi truyền dữ liệu. Vui lòng kiểm tra lại mạng hoặc URL Apps Script.', 'error');
+            }
         }
     </script>
 </body>
