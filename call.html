@@ -6,27 +6,22 @@
     <title>Ứng Dụng Gọi Video WebRTC</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        video {
-            background: #2d3748;
-            border-radius: 0.75rem;
-            width: 100%;
-            height: auto;
-        }
+        video { background: #2d3748; border-radius: 0.75rem; width: 100%; height: auto; }
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex flex-col items-center justify-center p-4">
 
     <div class="max-w-4xl w-full bg-white p-6 rounded-2xl shadow-xl">
-        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Trình Gọi Video Thử Nghiệm</h1>
+        <h1 class="text-2xl font-bold text-gray-800 mb-6 text-center">Trình Gọi Video WebRTC</h1>
         
-        <!-- Phần tạo link mời -->
-        <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Mời người khác tham gia:</label>
+        <div class="mb-6 p-4 bg-gray-50 rounded-xl border border-gray-200 space-y-4">
+            <div class="flex flex-col">
+                <label class="text-sm font-medium text-gray-700 mb-1">Mã kết nối (SDP / ICE Candidate):</label>
+                <textarea id="sdpArea" class="w-full p-2 border rounded-lg h-24 text-xs" placeholder="Dán mã nhận được từ đối tác ở đây..."></textarea>
+            </div>
             <div class="flex space-x-2">
-                <input type="text" id="inviteLink" readonly class="flex-1 p-2 border rounded-lg bg-gray-100 text-gray-600" placeholder="Nhấn nút tạo để lấy link...">
-                <button id="createLinkBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition">
-                    Tạo Link
-                </button>
+                <button id="createOfferBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Tạo Mã Gọi</button>
+                <button id="acceptAnswerBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg flex-1">Kết nối</button>
             </div>
         </div>
         
@@ -42,57 +37,59 @@
         </div>
 
         <div class="mt-8 flex justify-center space-x-4">
-            <button id="startBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-full transition">
-                Bật Camera
-            </button>
-            <button id="stopBtn" class="bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full transition" disabled>
-                Tắt Camera
-            </button>
+            <button id="startBtn" class="bg-gray-800 hover:bg-black text-white font-bold py-3 px-6 rounded-full transition">Bật Camera</button>
         </div>
     </div>
 
     <script>
         const localVideo = document.getElementById('localVideo');
+        const remoteVideo = document.getElementById('remoteVideo');
+        const sdpArea = document.getElementById('sdpArea');
         const startBtn = document.getElementById('startBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const createLinkBtn = document.getElementById('createLinkBtn');
-        const inviteLink = document.getElementById('inviteLink');
+        const createOfferBtn = document.getElementById('createOfferBtn');
+        const acceptAnswerBtn = document.getElementById('acceptAnswerBtn');
 
         let localStream;
+        const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
 
-        // Hàm tạo link mời (Giả lập)
-        createLinkBtn.addEventListener('click', () => {
-            const roomId = Math.random().toString(36).substring(2, 10);
-            const fullLink = window.location.origin + window.location.pathname + "?room=" + roomId;
-            inviteLink.value = fullLink;
-            alert("Link mời đã được tạo! Bạn có thể gửi cho đối tác.");
+        // Thu thập các ICE candidate
+        pc.onicecandidate = (event) => {
+            if (event.candidate) {
+                console.log("New ICE candidate: ", JSON.stringify(event.candidate));
+            }
+        };
+
+        pc.ontrack = (event) => { remoteVideo.srcObject = event.streams[0]; };
+
+        async function startCamera() {
+            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localVideo.srcObject = localStream;
+            localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+        }
+
+        createOfferBtn.addEventListener('click', async () => {
+            const offer = await pc.createOffer();
+            await pc.setLocalDescription(offer);
+            sdpArea.value = JSON.stringify(pc.localDescription);
+            alert("Đã tạo Offer! Hãy gửi mã này cho đối tác.");
         });
 
-        // Hàm truy cập camera và microphone
-        async function startCamera() {
-            try {
-                localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
-                localVideo.srcObject = localStream;
-                startBtn.disabled = true;
-                stopBtn.disabled = false;
-            } catch (error) {
-                console.error("Lỗi khi truy cập camera: ", error);
-                alert("Không thể truy cập camera. Vui lòng kiểm tra quyền.");
+        acceptAnswerBtn.addEventListener('click', async () => {
+            const data = JSON.parse(sdpArea.value);
+            
+            if (data.type === 'offer') {
+                await pc.setRemoteDescription(new RTCSessionDescription(data));
+                const answer = await pc.createAnswer();
+                await pc.setLocalDescription(answer);
+                sdpArea.value = JSON.stringify(pc.localDescription);
+                alert("Đã nhận Offer, tạo Answer thành công! Gửi lại mã này cho người gọi.");
+            } else if (data.type === 'answer') {
+                await pc.setRemoteDescription(new RTCSessionDescription(data));
+                alert("Đã kết nối thành công!");
             }
-        }
-
-        // Hàm dừng camera
-        function stopCamera() {
-            if (localStream) {
-                localStream.getTracks().forEach(track => track.stop());
-                localVideo.srcObject = null;
-                startBtn.disabled = false;
-                stopBtn.disabled = true;
-            }
-        }
+        });
 
         startBtn.addEventListener('click', startCamera);
-        stopBtn.addEventListener('click', stopCamera);
     </script>
 </body>
 </html>
